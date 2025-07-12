@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HangJegyzet 🎯
 
-## Getting Started
+AI-powered meeting transcription and insights platform for Hungarian businesses.
 
-First, run the development server:
+**🚀 Status: Pre-launch (30 days to go)**  
+**🎯 Goal: 100 paying customers in first month**  
+**💰 Unit Economics: €0.65 cost/user, €25+ revenue/user**  
+**🏭 Hosting: Hetzner (€39/month)**
+
+## 🚨 IMPORTANT: Launch Mode Active
+
+**We are in LAUNCH MODE. No new features until we have 100 paying customers.**
+
+- 📋 See [LAUNCH_ROADMAP.md](./LAUNCH_ROADMAP.md) for the 30-day plan
+- 💼 See [BUSINESS_TRACKER.md](./BUSINESS_TRACKER.md) for metrics
+- 🖥️ See [HETZNER_DEPLOYMENT.md](./docs/HETZNER_DEPLOYMENT.md) for deployment
+
+## 🚀 Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/yourusername/hangjegyzet-ai.git
+cd hangjegyzet-ai
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.local.example .env.local
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Open http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏗️ Tech Stack (Simplified for Launch)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Frontend**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
+- **Backend**: Node.js on Hetzner VPS (PM2)
+- **AI**: OpenAI Whisper + Claude API
+- **Database**: PostgreSQL 15 (self-hosted)
+- **Cache**: Redis (self-hosted)
+- **Payments**: Stripe (HUF support)
+- **Hosting**: Hetzner CX41 (€39/month)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📚 Essential Documentation
 
-## Learn More
+- [LAUNCH_ROADMAP.md](./LAUNCH_ROADMAP.md) - **READ THIS FIRST**
+- [BUSINESS_TRACKER.md](./BUSINESS_TRACKER.md) - Financials & metrics
+- [HETZNER_DEPLOYMENT.md](./docs/HETZNER_DEPLOYMENT.md) - Server setup
+- [AI_FEATURES_GUIDE.md](./docs/AI_FEATURES_GUIDE.md) - Feature documentation
 
-To learn more about Next.js, take a look at the following resources:
+## 🔐 Security (Launch Version)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- ✅ HTTPS everywhere
+- ✅ Encrypted file storage
+- ✅ GDPR compliant
+- ✅ Regular backups
+- 🔄 SOC2 (future)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## ✅ Launch Features (What Actually Works)
 
-## Deploy on Vercel
+### Ready Now
+- 🎙️ Upload audio (up to 2GB)
+- 📝 Get accurate Hungarian transcript
+- 🤖 AI-powered summary and action items
+- 📄 Export to Word/PDF
+- 💳 Pay with card (Stripe)
+- 🔐 Secure file handling
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Coming Soon (Post-Launch)
+- 🔴 Real-time transcription
+- 📊 Advanced analytics
+- 🔗 Zoom/Teams integration
+- 📱 Mobile app
+- 🏢 Team features
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 💰 Pricing
+
+- **Indulo**: 9,990 Ft/month (~€25)
+- **Profi**: 29,990 Ft/month (~€75)
+- **Vallalati**: 89,990 Ft/month (~€225)
+
+All plans include different amounts of Fast/Balanced/Precision minutes.
+
+## 🎯 Current Priorities
+
+1. **Fix critical bugs only**
+2. **Make payment flow bulletproof**
+3. **Polish user experience**
+4. **Get 100 paying customers**
+5. **Then add new features**
+
+## 📄 License
+
+Proprietary - All rights reserved
+
+---
+
+**Remember: Ship beats perfect. Revenue beats features.**

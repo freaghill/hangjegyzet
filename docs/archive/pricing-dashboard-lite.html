@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HangJegyzet - Revised Pricing Strategy</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            color: #1a73e8;
+        }
+        .warning {
+            background: #fef7e0;
+            border-left: 4px solid #f9ab00;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .pricing-tier {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            text-align: center;
+        }
+        .pricing-tier.recommended {
+            border-color: #1a73e8;
+            position: relative;
+        }
+        .pricing-tier.recommended::before {
+            content: "AJÁNLOTT";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a73e8;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .tier-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .tier-price {
+            font-size: 32px;
+            color: #1a73e8;
+            margin: 10px 0;
+        }
+        .tier-price small {
+            font-size: 16px;
+            color: #666;
+        }
+        .mode-limits {
+            background: #e8f0fe;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .mode-limits h4 {
+            margin: 0 0 10px 0;
+            color: #1a73e8;
+        }
+        .mode-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .danger {
+            background: #fce8e6;
+            border-left: 4px solid #d33b2c;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #e6f4ea;
+            border-left: 4px solid #34a853;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>HangJegyzet - Őszinte Árstratégia Felülvizsgálat</h1>
+            <p>A 3+1 szintű modell: Magyar KKV-k + Multinacionális vállalatok</p>
+        </div>
+
+        <div class="card">
+            <h2>❌ Problémák az előző javaslattal</h2>
+            <div class="warning">
+                <strong>Inkonzisztencia:</strong> Az előző javaslat percalapú volt, nem a Fast/Balanced/Precision módok alapján, amit korábban megbeszéltünk.
+            </div>
+            <div class="danger">
+                <strong>AI költség kockázat:</strong> Korlátlan Precision mód használat tönkretehet minket - egy 5 órás meeting precision módban ~$15-20 lehet csak AI költségben!
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✅ Javított 3+1 Szintű Árazás</h2>
+            <div class="pricing-grid">
+                <div class="pricing-tier">
+                    <div class="tier-name">Induló</div>
+                    <div class="tier-price">9,990 Ft<small>/hó</small></div>
+                    <div class="mode-limits">
+                        <h4>Havi limitek:</h4>
+                        <div class="mode-line">
+                            <span>⚡ Fast mód:</span>
+                            <span><strong>500 perc</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>⚖️ Balanced:</span>
+                            <span><strong>100 perc</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>🎯 Precision:</span>
+                            <span><strong>0 perc</strong></span>
+                        </div>
+                    </div>
+                    <p><strong>Célcsoport:</strong> Egyéni vállalkozók, kis csapatok</p>
+                </div>
+
+                <div class="pricing-tier recommended">
+                    <div class="tier-name">Profi</div>
+                    <div class="tier-price">29,990 Ft<small>/hó</small></div>
+                    <div class="mode-limits">
+                        <h4>Havi limitek:</h4>
+                        <div class="mode-line">
+                            <span>⚡ Fast mód:</span>
+                            <span><strong>2,000 perc</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>⚖️ Balanced:</span>
+                            <span><strong>500 perc</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>🎯 Precision:</span>
+                            <span><strong>50 perc</strong></span>
+                        </div>
+                    </div>
+                    <p><strong>Célcsoport:</strong> KKV-k, növekvő cégek</p>
+                </div>
+
+                <div class="pricing-tier">
+                    <div class="tier-name">Vállalati</div>
+                    <div class="tier-price">89,990 Ft<small>/hó</small></div>
+                    <div class="mode-limits">
+                        <h4>Havi limitek:</h4>
+                        <div class="mode-line">
+                            <span>⚡ Fast mód:</span>
+                            <span><strong>10,000 perc</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>⚖️ Balanced:</span>
+                            <span><strong>2,000 perc</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>🎯 Precision:</span>
+                            <span><strong>200 perc</strong></span>
+                        </div>
+                    </div>
+                    <p><strong>Célcsoport:</strong> Nagy magyar vállalatok</p>
+                </div>
+
+                <div class="pricing-tier" style="border-color: #ea4335;">
+                    <div class="tier-name">🌍 Multinational</div>
+                    <div class="tier-price">€599<small>/hó</small></div>
+                    <div class="mode-limits">
+                        <h4>Havi limitek:</h4>
+                        <div class="mode-line">
+                            <span>⚡ Fast mód:</span>
+                            <span><strong>Korlátlan</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>⚖️ Balanced:</span>
+                            <span><strong>10,000 perc</strong></span>
+                        </div>
+                        <div class="mode-line">
+                            <span>🎯 Precision:</span>
+                            <span><strong>1,000 perc</strong></span>
+                        </div>
+                    </div>
+                    <p><strong>Extra:</strong> Multi-language, API, SLA, Dedicated support</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💰 Költség Kontroll Stratégia</h2>
+            <table>
+                <tr>
+                    <th>Probléma</th>
+                    <th>Megoldás</th>
+                    <th>Implementáció</th>
+                </tr>
+                <tr>
+                    <td>Korlátlan Precision = csőd</td>
+                    <td>Kemény limitek minden csomagban</td>
+                    <td>Auto-downgrade to Balanced után limit</td>
+                </tr>
+                <tr>
+                    <td>Váratlan AI költség spike</td>
+                    <td>Napi maximum limitek</td>
+                    <td>Max 100 precision perc/nap még Enterprise-nál is</td>
+                </tr>
+                <tr>
+                    <td>Abuse prevention</td>
+                    <td>Fair use policy</td>
+                    <td>1 meeting max 3 óra, precision max 1 óra/meeting</td>
+                </tr>
+                <tr>
+                    <td>API költség robbanás</td>
+                    <td>Prepaid credit system</td>
+                    <td>Precision módért extra kreditet kell venni nagy használatnál</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Mód Választás Logika</h2>
+            <div class="success">
+                <strong>Automatikus mód ajánlás:</strong>
+                <ul>
+                    <li><strong>Fast:</strong> Jó minőségű audio, informális meeting → 90%+ pontosság</li>
+                    <li><strong>Balanced:</strong> Átlagos audio, üzleti meeting → 94%+ pontosság</li>
+                    <li><strong>Precision:</strong> Rossz audio, kritikus meeting, jogi/orvosi → 97%+ pontosság</li>
+                </ul>
+            </div>
+            
+            <h3>Költség Breakdown (per perc)</h3>
+            <table>
+                <tr>
+                    <th>Mód</th>
+                    <th>AI Költség</th>
+                    <th>Ár Usernek</th>
+                    <th>Margin</th>
+                </tr>
+                <tr>
+                    <td>Fast</td>
+                    <td>$0.007</td>
+                    <td>$0.05 (~20 Ft)</td>
+                    <td>86%</td>
+                </tr>
+                <tr>
+                    <td>Balanced</td>
+                    <td>$0.010</td>
+                    <td>$0.10 (~40 Ft)</td>
+                    <td>90%</td>
+                </tr>
+                <tr>
+                    <td>Precision</td>
+                    <td>$0.022</td>
+                    <td>$0.30 (~120 Ft)</td>
+                    <td>93%</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>🌍 Multinational Tier Részletek</h2>
+            <div class="warning">
+                <strong>Miért €599 és nem HUF?</strong>
+                <ul>
+                    <li>Nemzetközi cégek EUR/USD-ban gondolkodnak</li>
+                    <li>Ez ~230,000 HUF - még mindig versenyképes</li>
+                    <li>Összehasonlítás: Otter.ai Enterprise = $30/user/month (min 3 user)</li>
+                </ul>
+            </div>
+            
+            <h3>Extra Features for Multinationals:</h3>
+            <ul>
+                <li>✅ Multi-language support (EN, DE, HU)</li>
+                <li>✅ SSO integration</li>
+                <li>✅ API access with higher rate limits</li>
+                <li>✅ Custom AI training on company data</li>
+                <li>✅ Dedicated infrastructure option</li>
+                <li>✅ 99.9% SLA</li>
+                <li>✅ 24/7 support in English</li>
+                <li>✅ Compliance certificates (SOC2, ISO)</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>⚠️ Őszinte Aggályok és Megoldások</h2>
+            <div class="danger">
+                <h3>Nagy Kockázat: Precision Mode Abuse</h3>
+                <p><strong>Scenario:</strong> Valaki felvesz 10 óra "háttérzajt" és Precision módban átíratja = $130+ költség!</p>
+                <p><strong>Megoldás:</strong></p>
+                <ul>
+                    <li>Audio quality check - ha nincs beszéd, reject</li>
+                    <li>Minimum speech threshold (20%+)</li>
+                    <li>Abnormal usage alerts</li>
+                    <li>Manual review for 2+ óra precision requests</li>
+                </ul>
+            </div>
+
+            <div class="warning">
+                <h3>Közép Kockázat: Árverseny</h3>
+                <p><strong>Mi történik ha a Microsoft/Google ingyen adja?</strong></p>
+                <ul>
+                    <li>Fókusz a magyar pontosságon (ők max 80% lesznek)</li>
+                    <li>Speciális iparági funkciók (jogi, orvosi)</li>
+                    <li>Helyi support és integráció</li>
+                    <li>Adatvédelem (EU servers, GDPR++)</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card" style="background: #e8f0fe;">
+            <h2>📊 Reális Bevételi Modell</h2>
+            <h3>100 ügyfél mix:</h3>
+            <ul>
+                <li>40 Induló × 9,990 Ft = 399,600 Ft</li>
+                <li>40 Profi × 29,990 Ft = 1,199,600 Ft</li>
+                <li>15 Vállalati × 89,990 Ft = 1,349,850 Ft</li>
+                <li>5 Multinational × €599 = €2,995 (~1,150,000 Ft)</li>
+            </ul>
+            <p><strong>Total MRR: ~4,100,000 Ft (~€10,600)</strong></p>
+            <p><strong>Costs: ~€1,000</strong></p>
+            <p><strong>Profit: ~€9,600/month (90%+ margin)</strong></p>
+        </div>
+    </div>
+</body>
+</html>

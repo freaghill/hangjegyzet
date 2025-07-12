@@ -1,0 +1,102 @@
+# Dependencies - 911MB + 524MB + 43MB = ~1.5GB
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Next.js build outputs and cache - 442MB
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Backend build outputs
+backend/dist/
+backend/build/
+
+# Log files
+*.log
+backend/*.log
+frontend/*.log
+backend-new.log
+
+# Database files and migrations
+backend/prisma/migrations/
+*.db
+*.sqlite
+*.sqlite3
+
+# Cache and temporary directories
+.cache/
+.turbo/
+.vite/
+.nuxt/
+.tmp/
+tmp/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Large binary and media files
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+*.iso
+*.dmg
+
+# Docker and deployment
+docker-data/
+*.tar
+.docker/
+
+# Coverage and test outputs
+coverage/
+.nyc_output/
+.coverage
+htmlcov/
+playwright-report/
+test-results/
+e2e-results/
+
+# TypeScript build info
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Source maps
+*.map
+**/*.map
+
+# Public build assets
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+
+# Optional exclusions - uncomment if needed
+# docs/archive/
+# docs/*.html
+# deployment/
+
+# Environment and secrets (good practice)
+.env.local
+.env.production
+.env.development
+*.pem
+*.key
