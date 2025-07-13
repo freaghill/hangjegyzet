@@ -131,6 +131,7 @@
     "@uppy/dashboard": "^4.3.4",
     "@uppy/dropbox": "^4.2.3",
     "@uppy/google-drive": "^4.3.3",
+    "@uppy/locales": "^4.6.0",
     "@uppy/onedrive": "^4.2.4",
     "@uppy/react": "^4.4.0",
     "@uppy/tus": "^4.2.2",
