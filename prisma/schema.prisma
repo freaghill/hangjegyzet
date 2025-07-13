@@ -1,0 +1,397 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  name             String?
+  image            String?
+  role             String           @default("user")
+  emailVerified    DateTime?
+  password         String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  
+  // Relations
+  accounts         Account[]
+  sessions         Session[]
+  meetings         Meeting[]
+  payments         Payment[]
+  subscriptions    Subscription[]
+  invoices         Invoice[]
+  usageRecords     UsageRecord[]
+  organizationMemberships OrganizationMember[]
+  teamMemberships  TeamMember[]
+  sentInvitations  TeamInvitation[] @relation("inviter")
+  emailLogs        EmailLog[]
+  searchHistory    SearchHistory[]
+  alerts           Alert[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Organization {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  logo          String?
+  primaryColor  String?
+  secondaryColor String?
+  customDomain  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  members       OrganizationMember[]
+  teams         Team[]
+  meetings      Meeting[]
+  invoices      Invoice[]
+  emailTemplates EmailTemplate[]
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  role           String       @default("member")
+  joinedAt       DateTime     @default(now())
+  
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, userId])
+}
+
+model Team {
+  id             String           @id @default(cuid())
+  name           String
+  slug           String           @unique
+  description    String?
+  organizationId String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  
+  // Relations
+  organization   Organization?    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  members        TeamMember[]
+  invitations    TeamInvitation[]
+  meetingShares  MeetingShare[]
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      TeamRole @default(MEMBER)
+  joinedAt  DateTime @default(now())
+  
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamId, userId])
+}
+
+model TeamInvitation {
+  id        String   @id @default(cuid())
+  teamId    String
+  email     String
+  role      TeamRole @default(MEMBER)
+  token     String   @unique @default(cuid())
+  invitedBy String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  inviter   User     @relation("inviter", fields: [invitedBy], references: [id])
+  
+  @@index([email])
+  @@index([token])
+}
+
+model Meeting {
+  id               String   @id @default(cuid())
+  title            String
+  description      String?
+  userId           String
+  organizationId   String?
+  fileUrl          String?
+  fileName         String?
+  fileSize         Int?
+  mimeType         String?
+  duration         Int?
+  language         String?
+  status           String   @default("pending")
+  transcriptionUrl String?
+  transcription    String?  @db.Text
+  summary          String?  @db.Text
+  tags             String[]
+  metadata         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Full-text search
+  searchVector     Unsupported("tsvector")?
+  
+  // Relations
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization     Organization?   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  speakers         Speaker[]
+  transcripts      Transcript[]
+  shares           MeetingShare[]
+  exports          MeetingExport[]
+  uploadChunks     UploadChunk[]
+  
+  @@index([userId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([searchVector], type: Gin)
+}
+
+model MeetingShare {
+  id          String    @id @default(cuid())
+  meetingId   String
+  teamId      String?
+  shareToken  String    @unique @default(cuid())
+  permissions String[]  @default(["view"])
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  
+  meeting     Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  team        Team?     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@index([shareToken])
+}
+
+model Speaker {
+  id        String   @id @default(cuid())
+  meetingId String
+  name      String
+  email     String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model Transcript {
+  id         String   @id @default(cuid())
+  meetingId  String
+  speakerId  String?
+  startTime  Float
+  endTime    Float
+  text       String   @db.Text
+  confidence Float?
+  createdAt  DateTime @default(now())
+  
+  meeting    Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  
+  @@index([meetingId])
+}
+
+model MeetingExport {
+  id        String   @id @default(cuid())
+  meetingId String
+  format    String
+  url       String
+  createdAt DateTime @default(now())
+  
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model UploadChunk {
+  id          String   @id @default(cuid())
+  uploadId    String
+  meetingId   String?
+  chunkNumber Int
+  totalChunks Int
+  size        Int
+  etag        String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  
+  meeting     Meeting? @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  
+  @@unique([uploadId, chunkNumber])
+  @@index([uploadId])
+  @@index([status])
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  userId          String
+  amount          Int
+  currency        String   @default("HUF")
+  status          String   @default("pending")
+  provider        String
+  providerPaymentId String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id              String   @id @default(cuid())
+  userId          String
+  planId          String
+  status          String   @default("active")
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelAtPeriodEnd Boolean @default(false)
+  provider        String
+  providerSubscriptionId String?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id              String   @id @default(cuid())
+  userId          String
+  organizationId  String?
+  invoiceNumber   String   @unique
+  amount          Int
+  currency        String   @default("HUF")
+  status          String   @default("draft")
+  dueDate         DateTime
+  paidAt          DateTime?
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model UsageRecord {
+  id              String   @id @default(cuid())
+  userId          String
+  type            String
+  quantity        Int
+  metadata        Json?
+  createdAt       DateTime @default(now())
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, type, createdAt])
+}
+
+model EmailLog {
+  id              String   @id @default(cuid())
+  userId          String?
+  to              String
+  from            String
+  subject         String
+  template        String?
+  status          String   @default("pending")
+  provider        String   @default("sendgrid")
+  providerMessageId String?
+  error           String?
+  metadata        Json?
+  sentAt          DateTime?
+  createdAt       DateTime @default(now())
+  
+  user            User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EmailTemplate {
+  id              String        @id @default(cuid())
+  organizationId  String?
+  name            String
+  subject         String
+  htmlContent     String        @db.Text
+  textContent     String?       @db.Text
+  variables       String[]
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, name])
+}
+
+model SearchHistory {
+  id              String   @id @default(cuid())
+  userId          String
+  query           String
+  filters         Json?
+  resultCount     Int
+  createdAt       DateTime @default(now())
+  
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+}
+
+model Alert {
+  id              String   @id @default(cuid())
+  userId          String?
+  type            String
+  severity        String
+  title           String
+  message         String   @db.Text
+  metadata        Json?
+  acknowledged    Boolean  @default(false)
+  acknowledgedAt  DateTime?
+  createdAt       DateTime @default(now())
+  
+  user            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([type, severity])
+  @@index([acknowledged])
+  @@index([createdAt])
+}
+
+enum TeamRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
