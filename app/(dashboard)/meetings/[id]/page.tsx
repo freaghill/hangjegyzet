@@ -11,10 +11,14 @@ import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
 import { Clock, Users, Target, Download, Copy, Play, Brain, TrendingUp, MessageSquare, Sparkles, FileText, Wand2, Share2, Calendar, Video, MapPin, StickyNote, CheckCircle, XCircle, AlertCircle, FileDown } from 'lucide-react'
+import { ShareMeetingDialog } from '@/components/meetings/share-meeting-dialog'
 import { MeetingHighlights } from '@/components/meetings/meeting-highlights'
 import { ShareManager } from '@/components/meetings/share-manager'
 import { CollaborativeAnnotations } from '@/components/meetings/collaborative-annotations'
 import { CRMLinker } from '@/components/meetings/crm-linker'
+import { AudioPlayer } from '@/components/meetings/audio-player'
+import { TranscriptViewer } from '@/components/meetings/transcript-viewer'
+import { ExportDialog } from '@/components/meetings/export-dialog'
 
 interface Meeting {
   id: string
@@ -22,13 +26,17 @@ interface Meeting {
   created_at: string
   duration_seconds: number
   status: string
+  file_path?: string
   transcript: {
     text: string
     original_text?: string
     segments?: Array<{
-      start: number
-      end: number
+      id: string
+      speaker?: string
+      start_time: number
+      end_time: number
       text: string
+      confidence?: number
     }>
   }
   metadata?: {
@@ -108,6 +116,10 @@ export default function MeetingDetailsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('cleaned')
   const [currentUser, setCurrentUser] = useState<string | null>(null)
+  const [currentAudioTime, setCurrentAudioTime] = useState(0)
+  const [audioUrl, setAudioUrl] = useState<string | null>(null)
+  const [showExportDialog, setShowExportDialog] = useState(false)
+  const [showShareDialog, setShowShareDialog] = useState(false)
   const supabase = createClient()
 
   const loadCurrentUser = useCallback(async () => {
@@ -150,6 +162,14 @@ export default function MeetingDetailsPage() {
 
       if (error) throw error
       setMeeting(data)
+      
+      // Get audio URL if available
+      if (data?.file_path) {
+        const { data: { publicUrl } } = supabase.storage
+          .from('meeting-recordings')
+          .getPublicUrl(data.file_path)
+        setAudioUrl(publicUrl)
+      }
     } catch (error) {
       console.error('Error loading meeting:', error)
       toast.error('Hiba történt a meeting betöltése során')
@@ -320,15 +340,24 @@ export default function MeetingDetailsPage() {
             {new Date(meeting.created_at).toLocaleString('hu-HU')}
           </p>
         </div>
-        <Badge
-          variant={
-            meeting.status === 'completed' ? 'default' :
-            meeting.status === 'processing' ? 'secondary' : 'destructive'
-          }
-        >
-          {meeting.status === 'completed' ? 'Kész' :
-           meeting.status === 'processing' ? 'Feldolgozás alatt' : 'Sikertelen'}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowShareDialog(true)}
+          >
+            <Share2 className="h-4 w-4 mr-2" />
+            Megosztás
+          </Button>
+          <Badge
+            variant={
+              meeting.status === 'completed' ? 'default' :
+              meeting.status === 'processing' ? 'secondary' : 'destructive'
+            }
+          >
+            {meeting.status === 'completed' ? 'Kész' :
+             meeting.status === 'processing' ? 'Feldolgozás alatt' : 'Sikertelen'}
+          </Badge>
+        </div>
       </div>
 
       {/* Stats */}
@@ -621,6 +650,22 @@ export default function MeetingDetailsPage() {
             <CRMLinker meetingId={meeting.id} />
           </div>
 
+          {/* Audio Player */}
+          {audioUrl && (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Play className="h-5 w-5 text-blue-600" />
+                Hangfelvétel
+              </h2>
+              <AudioPlayer
+                src={audioUrl}
+                title={meeting.title}
+                onTimeUpdate={setCurrentAudioTime}
+                onSeek={setCurrentAudioTime}
+              />
+            </div>
+          )}
+
           {/* Topics and Next Steps */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {meeting.metadata?.topics && meeting.metadata.topics.length > 0 && (
@@ -665,23 +710,40 @@ export default function MeetingDetailsPage() {
             )}
           </div>
 
-          {/* Transcript and Annotations */}
-          <Card className="glass-effect">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Átirat és Annotációk</span>
-                {meeting.annotation_count !== undefined && meeting.annotation_count > 0 && (
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <StickyNote className="h-3 w-3" />
-                    {meeting.annotation_count} annotáció
-                  </Badge>
-                )}
-              </CardTitle>
-              <CardDescription>
-                Teljes szöveges átirat megjegyzésekkel és akció pontokkal
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
+          {/* Transcript Viewer */}
+          {meeting.transcript?.segments && meeting.transcript.segments.length > 0 ? (
+            <div className="mb-8">
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-blue-600" />
+                Átírás
+              </h2>
+              <TranscriptViewer
+                segments={meeting.transcript.segments}
+                currentTime={currentAudioTime}
+                onSegmentClick={(segment) => setCurrentAudioTime(segment.start_time)}
+                title={meeting.title}
+                language={meeting.metadata?.language || 'hu'}
+                className="h-[600px]"
+              />
+            </div>
+          ) : (
+            /* Legacy transcript display */
+            <Card className="glass-effect">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Átirat és Annotációk</span>
+                  {meeting.annotation_count !== undefined && meeting.annotation_count > 0 && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <StickyNote className="h-3 w-3" />
+                      {meeting.annotation_count} annotáció
+                    </Badge>
+                  )}
+                </CardTitle>
+                <CardDescription>
+                  Teljes szöveges átirat megjegyzésekkel és akció pontokkal
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
               {meeting.metadata?.cleanup_stats && meeting.metadata?.cleaned && (
                 <div className="mb-4 p-4 bg-blue-50 rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
@@ -747,18 +809,10 @@ export default function MeetingDetailsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => exportMeeting('pdf')}
+                    onClick={() => setShowExportDialog(true)}
                   >
                     <FileDown className="h-4 w-4 mr-2" />
-                    Export PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => exportMeeting('docx')}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Export Word
+                    Exportálás
                   </Button>
                   {!meeting.metadata?.cleaned && (
                     <Button
@@ -802,6 +856,7 @@ export default function MeetingDetailsPage() {
               </Tabs>
             </CardContent>
           </Card>
+          )}
         </>
       )}
 
@@ -827,6 +882,29 @@ export default function MeetingDetailsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+      
+      {/* Export Dialog */}
+      {meeting && (
+        <ExportDialog
+          open={showExportDialog}
+          onOpenChange={setShowExportDialog}
+          meetingId={meeting.id}
+          meetingTitle={meeting.title}
+        />
+      )}
+
+      {/* Share Dialog */}
+      {meeting && (
+        <ShareMeetingDialog
+          open={showShareDialog}
+          onOpenChange={setShowShareDialog}
+          meetingId={meeting.id}
+          meetingTitle={meeting.title}
+          onSuccess={() => {
+            toast.success('Meeting sikeresen megosztva')
+          }}
+        />
       )}
     </div>
   )

@@ -1,68 +1,108 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { withApiAuth, createPaginatedResponse } from '@/lib/api/middleware'
+import { withApiAuth } from '@/lib/api/middleware'
 import { createClient } from '@/lib/supabase/server'
+import { 
+  parsePaginationParams, 
+  createPaginatedResponse,
+  parseFieldSelection,
+  setCacheHeaders,
+  createPrismaSelect
+} from '@/lib/api/pagination'
+import { withCache } from '@/lib/cache/cache-middleware'
+import { cacheKeys } from '@/lib/cache/redis-client'
 
 /**
  * GET /api/v1/meetings - List meetings
  */
-export const GET = withApiAuth(async (request, context) => {
-  const { searchParams } = new URL(request.url)
-  const page = parseInt(searchParams.get('page') || '1')
-  const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100)
-  const status = searchParams.get('status')
-  const from = searchParams.get('from')
-  const to = searchParams.get('to')
-  
-  const supabase = await createClient()
-  
-  // Build query
-  let query = supabase
-    .from('meetings')
-    .select('*', { count: 'exact' })
-    .eq('organization_id', context.organizationId)
-    .order('created_at', { ascending: false })
-  
-  // Apply filters
-  if (status) {
-    query = query.eq('status', status)
-  }
-  if (from) {
-    query = query.gte('created_at', from)
-  }
-  if (to) {
-    query = query.lte('created_at', to)
-  }
-  
-  // Apply pagination
-  const offset = (page - 1) * limit
-  query = query.range(offset, offset + limit - 1)
-  
-  const { data, error, count } = await query
-  
-  if (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch meetings' },
-      { status: 500 }
+export const GET = withApiAuth(
+  withCache(async (request, context) => {
+    const { searchParams } = new URL(request.url)
+    
+    // Parse pagination params
+    const pagination = parsePaginationParams(searchParams)
+    const fieldSelection = parseFieldSelection({
+      fields: searchParams.get('fields') || undefined,
+      include: searchParams.get('include') || undefined,
+      exclude: searchParams.get('exclude') || undefined,
+    })
+    
+    // Parse filters
+    const status = searchParams.get('status')
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+    const search = searchParams.get('search')
+    
+    const supabase = await createClient()
+    
+    // Build optimized query with field selection
+    const defaultFields = 'id,title,status,duration_seconds,created_at,summary'
+    const selectFields = searchParams.get('fields') || defaultFields
+    
+    let query = supabase
+      .from('meetings')
+      .select(selectFields, { count: 'exact' })
+      .eq('organization_id', context.organizationId)
+    
+    // Apply sorting
+    if (pagination.sort) {
+      query = query.order(pagination.sort, { ascending: pagination.order === 'asc' })
+    } else {
+      query = query.order('created_at', { ascending: false })
+    }
+    
+    // Apply filters
+    if (status) {
+      query = query.eq('status', status)
+    }
+    if (from) {
+      query = query.gte('created_at', from)
+    }
+    if (to) {
+      query = query.lte('created_at', to)
+    }
+    if (search) {
+      query = query.or(`title.ilike.%${search}%,summary.ilike.%${search}%`)
+    }
+    
+    // Apply pagination
+    const offset = (pagination.page - 1) * pagination.limit
+    query = query.range(offset, offset + pagination.limit - 1)
+    
+    const { data, error, count } = await query
+    
+    if (error) {
+      return NextResponse.json(
+        { error: 'Failed to fetch meetings' },
+        { status: 500 }
+      )
+    }
+    
+    // Create response with proper caching headers
+    const response = NextResponse.json(
+      createPaginatedResponse(data || [], count || 0, pagination)
     )
-  }
-  
-  // Format response
-  const meetings = data.map(meeting => ({
-    id: meeting.id,
-    title: meeting.title,
-    status: meeting.status,
-    duration_seconds: meeting.duration_seconds,
-    created_at: meeting.created_at,
-    transcript_available: !!meeting.transcript,
-    summary: meeting.summary,
-    intelligence_score: meeting.intelligence_score,
-    speakers_count: meeting.speakers?.length || 0
-  }))
-  
-  return NextResponse.json(
-    createPaginatedResponse(meetings, page, limit, count || 0)
-  )
-}, { resource: 'meetings', action: 'read' })
+    
+    // Set cache headers based on filters
+    setCacheHeaders(response.headers, {
+      maxAge: 0, // Don't cache in browser
+      sMaxAge: status || from || to || search ? 60 : 300, // Cache filtered results less
+      staleWhileRevalidate: 60,
+      private: true, // User-specific data
+    })
+    
+    return response
+  }, {
+    ttl: 300, // 5 minutes
+    key: (req) => {
+      const url = new URL(req.url)
+      const params = url.searchParams.toString()
+      return cacheKeys.userMeetings(context.organizationId) + ':' + params
+    },
+    swr: true,
+    swrTtl: 60,
+  }), 
+  { resource: 'meetings', action: 'read' }
+)
 
 /**
  * POST /api/v1/meetings - Create a new meeting via URL

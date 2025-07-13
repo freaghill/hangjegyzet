@@ -1,0 +1,759 @@
+openapi: 3.0.3
+info:
+  title: Hangjegyzet API
+  description: |
+    Hangjegyzet is a meeting transcription and analysis platform that provides AI-powered insights,
+    real-time transcription, and comprehensive meeting management features.
+    
+    ## Authentication
+    
+    Most endpoints require authentication using Supabase Auth. Include the bearer token in the Authorization header:
+    ```
+    Authorization: Bearer <access_token>
+    ```
+    
+    ## Rate Limiting
+    
+    API endpoints implement rate limiting based on endpoint type:
+    - Standard endpoints: 100 requests/minute
+    - AI endpoints: 20 requests/minute
+    - Real-time endpoints: Connection-based limits
+    
+    ## Common Response Codes
+    
+    - 200: Success
+    - 201: Created
+    - 400: Bad Request
+    - 401: Unauthorized
+    - 403: Forbidden
+    - 404: Not Found
+    - 429: Too Many Requests
+    - 500: Internal Server Error
+  version: 1.0.0
+  contact:
+    name: Hangjegyzet Support
+    email: support@hangjegyzet.hu
+  license:
+    name: Proprietary
+servers:
+  - url: https://hangjegyzet.hu/api
+    description: Production server
+  - url: https://dev.hangjegyzet.hu/api
+    description: Development server
+  - url: http://localhost:3000/api
+    description: Local development
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Meetings
+    description: Meeting management and transcription
+  - name: AI
+    description: AI-powered features and analytics
+  - name: Real-time
+    description: Real-time transcription and analysis
+  - name: Integrations
+    description: Third-party integrations
+  - name: Payments
+    description: Subscription and billing management
+  - name: Admin
+    description: Administrative endpoints
+  - name: Health
+    description: Health checks and monitoring
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+        details:
+          type: string
+          description: Additional error details
+        code:
+          type: string
+          description: Error code
+      required:
+        - error
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+        message:
+          type: string
+        data:
+          type: object
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        role:
+          type: string
+          enum: [user, admin]
+        createdAt:
+          type: string
+          format: date-time
+    Meeting:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        duration:
+          type: number
+          description: Duration in seconds
+        participantCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        transcription:
+          $ref: '#/components/schemas/Transcription'
+    Transcription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+        language:
+          type: string
+        segments:
+          type: array
+          items:
+            $ref: '#/components/schemas/TranscriptionSegment'
+    TranscriptionSegment:
+      type: object
+      properties:
+        startTime:
+          type: number
+        endTime:
+          type: number
+        text:
+          type: string
+        speaker:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: Create a new user account with email verification
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                name:
+                  type: string
+                companyName:
+                  type: string
+              required:
+                - email
+                - password
+                - name
+            example:
+              email: user@example.com
+              password: securePassword123
+              name: John Doe
+              companyName: Acme Corp
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+              example:
+                success: true
+                message: Registration successful. Please check your email to verify your account.
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/session:
+    get:
+      tags:
+        - Authentication
+      summary: Get current session
+      description: Retrieve the current user's session information
+      responses:
+        '200':
+          description: Session information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: string
+                  email:
+                    type: string
+                  accessToken:
+                    type: string
+              example:
+                userId: 123e4567-e89b-12d3-a456-426614174000
+                email: user@example.com
+                accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /meetings/{id}/transcribe:
+    post:
+      tags:
+        - Meetings
+      summary: Queue meeting transcription
+      description: Queue a meeting for transcription processing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Meeting ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [fast, balanced, precision]
+                  default: balanced
+                  description: Transcription processing mode
+                language:
+                  type: string
+                  default: hu
+                  description: Language code (ISO 639-1)
+            example:
+              mode: balanced
+              language: hu
+      responses:
+        '200':
+          description: Transcription queued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                  estimatedTime:
+                    type: integer
+                    description: Estimated processing time in seconds
+              example:
+                jobId: job_123456789
+                estimatedTime: 300
+        '404':
+          description: Meeting not found
+        '429':
+          description: Rate limit exceeded
+  /meetings/{id}/annotations:
+    get:
+      tags:
+        - Meetings
+      summary: Get meeting annotations
+      description: Retrieve all annotations for a specific meeting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: List of annotations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    timestamp:
+                      type: number
+                    text:
+                      type: string
+                    author:
+                      type: string
+    post:
+      tags:
+        - Meetings
+      summary: Add annotation
+      description: Add a new annotation to a meeting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                timestamp:
+                  type: number
+                  description: Timestamp in seconds
+                text:
+                  type: string
+              required:
+                - timestamp
+                - text
+      responses:
+        '201':
+          description: Annotation created
+  /meetings/{id}/share:
+    post:
+      tags:
+        - Meetings
+      summary: Generate share link
+      description: Create a shareable link for a meeting
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                expiresIn:
+                  type: integer
+                  description: Link expiration time in hours
+                  default: 168
+                permissions:
+                  type: array
+                  items:
+                    type: string
+                    enum: [view, comment, download]
+                  default: [view]
+      responses:
+        '200':
+          description: Share link created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shareUrl:
+                    type: string
+                  token:
+                    type: string
+                  expiresAt:
+                    type: string
+                    format: date-time
+  /meetings/{id}/ai/extract-actions:
+    post:
+      tags:
+        - Meetings
+        - AI
+      summary: Extract action items
+      description: Use AI to extract action items from meeting transcript
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Action items extracted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  actions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        description:
+                          type: string
+                        assignee:
+                          type: string
+                        dueDate:
+                          type: string
+                          format: date
+                        priority:
+                          type: string
+                          enum: [low, medium, high]
+              example:
+                actions:
+                  - description: Prepare quarterly report
+                    assignee: John Doe
+                    dueDate: "2024-01-15"
+                    priority: high
+                  - description: Schedule follow-up meeting
+                    assignee: Jane Smith
+                    dueDate: "2024-01-10"
+                    priority: medium
+  /ai/analytics:
+    get:
+      tags:
+        - AI
+      summary: Get meeting analytics
+      description: Retrieve AI-generated analytics for a meeting
+      parameters:
+        - name: meetingId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  speakingTime:
+                    type: object
+                    additionalProperties:
+                      type: number
+                  effectiveness:
+                    type: object
+                    properties:
+                      score:
+                        type: number
+                      insights:
+                        type: array
+                        items:
+                          type: string
+                  patterns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        pattern:
+                          type: string
+                        frequency:
+                          type: integer
+                  engagement:
+                    type: object
+                    properties:
+                      level:
+                        type: string
+                        enum: [low, medium, high]
+                      score:
+                        type: number
+    post:
+      tags:
+        - AI
+      summary: Generate analytics
+      description: Generate new analytics for a meeting
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                meetingId:
+                  type: string
+                  format: uuid
+                analysisType:
+                  type: string
+                  enum: [speaking_time, effectiveness, patterns, energy, engagement]
+              required:
+                - meetingId
+                - analysisType
+      responses:
+        '200':
+          description: Analytics generated
+        '429':
+          description: Rate limit exceeded
+  /realtime/connect:
+    get:
+      tags:
+        - Real-time
+      summary: Get WebSocket connection
+      description: Retrieve WebSocket connection details for real-time features
+      responses:
+        '200':
+          description: Connection details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    description: WebSocket URL
+                  token:
+                    type: string
+                    description: Authentication token
+                  protocols:
+                    type: array
+                    items:
+                      type: string
+              example:
+                url: wss://realtime.hangjegyzet.hu
+                token: rt_token_123456
+                protocols: ["v1", "v2"]
+  /integrations/zoom/auth:
+    get:
+      tags:
+        - Integrations
+      summary: Zoom OAuth
+      description: Initiate Zoom OAuth authentication flow
+      parameters:
+        - name: redirect
+          in: query
+          schema:
+            type: string
+          description: Redirect URL after authentication
+      responses:
+        '302':
+          description: Redirect to Zoom OAuth
+  /integrations/zoom/recordings:
+    get:
+      tags:
+        - Integrations
+      summary: List Zoom recordings
+      description: Retrieve list of available Zoom recordings
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Start date filter
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: End date filter
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: List of recordings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recordings:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        topic:
+                          type: string
+                        startTime:
+                          type: string
+                          format: date-time
+                        duration:
+                          type: integer
+                        downloadUrl:
+                          type: string
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalRecords:
+                        type: integer
+  /subscriptions/create:
+    post:
+      tags:
+        - Payments
+      summary: Create subscription
+      description: Create a new subscription for the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: string
+                  enum: [starter, professional, enterprise]
+                billingPeriod:
+                  type: string
+                  enum: [monthly, yearly]
+                  default: monthly
+                paymentMethod:
+                  type: string
+                  enum: [card, bank_transfer]
+              required:
+                - plan
+      responses:
+        '200':
+          description: Subscription created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  paymentUrl:
+                    type: string
+                    description: URL to complete payment
+                  transactionId:
+                    type: string
+                  subscriptionId:
+                    type: string
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check API health status
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded, error]
+                  checks:
+                    type: object
+                    properties:
+                      api:
+                        type: boolean
+                      database:
+                        type: boolean
+                      cache:
+                        type: boolean
+                      storage:
+                        type: boolean
+                  timestamp:
+                    type: string
+                    format: date-time
+        '503':
+          description: Service unhealthy
+  /admin/monitoring/system:
+    get:
+      tags:
+        - Admin
+      summary: System metrics
+      description: Get detailed system metrics (admin only)
+      responses:
+        '200':
+          description: System metrics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cpu:
+                    type: number
+                    description: CPU usage percentage
+                  memory:
+                    type: number
+                    description: Memory usage percentage
+                  disk:
+                    type: number
+                    description: Disk usage percentage
+                  network:
+                    type: object
+                    properties:
+                      in:
+                        type: number
+                      out:
+                        type: number
+                  database:
+                    type: object
+                    properties:
+                      connections:
+                        type: integer
+                      responseTime:
+                        type: number
+                      queryCount:
+                        type: integer
+                  cache:
+                    type: object
+                    properties:
+                      hitRate:
+                        type: number
+                      size:
+                        type: number
+                      evictions:
+                        type: integer
+        '403':
+          description: Forbidden - Admin access required

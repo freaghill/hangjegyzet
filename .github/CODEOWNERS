@@ -1,0 +1,57 @@
+# CODEOWNERS for Hangjegyzet
+
+# Global owners
+* @hangjegyzet/core-team
+
+# Frontend
+/app/ @hangjegyzet/frontend
+/components/ @hangjegyzet/frontend
+/hooks/ @hangjegyzet/frontend
+/styles/ @hangjegyzet/frontend
+*.css @hangjegyzet/frontend
+*.scss @hangjegyzet/frontend
+
+# Backend
+/app/api/ @hangjegyzet/backend
+/lib/ @hangjegyzet/backend
+/server/ @hangjegyzet/backend
+/workers/ @hangjegyzet/backend
+
+# Database
+/prisma/ @hangjegyzet/backend @hangjegyzet/dba
+*.sql @hangjegyzet/dba
+
+# AI/ML
+/lib/ai/ @hangjegyzet/ai-team
+/workers/ai-processing.worker.ts @hangjegyzet/ai-team
+
+# Security
+/lib/security/ @hangjegyzet/security
+/middleware* @hangjegyzet/security
+.env* @hangjegyzet/security
+
+# DevOps
+/.github/ @hangjegyzet/devops
+/scripts/ @hangjegyzet/devops
+Dockerfile @hangjegyzet/devops
+docker-compose* @hangjegyzet/devops
+vercel.json @hangjegyzet/devops
+
+# Documentation
+/docs/ @hangjegyzet/docs-team
+*.md @hangjegyzet/docs-team
+/README.md @hangjegyzet/core-team
+
+# Tests
+/tests/ @hangjegyzet/qa
+/__tests__/ @hangjegyzet/qa
+*.test.ts @hangjegyzet/qa
+*.test.tsx @hangjegyzet/qa
+*.spec.ts @hangjegyzet/qa
+jest.config.js @hangjegyzet/qa
+playwright.config.ts @hangjegyzet/qa
+
+# Dependencies
+package.json @hangjegyzet/core-team @hangjegyzet/security
+package-lock.json @hangjegyzet/core-team @hangjegyzet/security
+pnpm-lock.yaml @hangjegyzet/core-team @hangjegyzet/security

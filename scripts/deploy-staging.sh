@@ -1,125 +1,80 @@
 #!/bin/bash
 
-# Staging Deployment Script for HangJegyzet.AI
-# This script deploys the application to the staging environment
+# Deploy to staging script
 
 set -e
 
-echo "🚀 Starting staging deployment..."
+echo "🚀 Deploying to Staging"
+echo "======================"
+echo ""
 
-# Configuration
-STAGING_SERVER="staging.hangjegyzet.ai"
-STAGING_USER="deploy"
-STAGING_PATH="/var/www/staging.hangjegyzet.ai"
-STAGING_PM2_NAME="hangjegyzet-staging"
-STAGING_WS_PM2_NAME="hangjegyzet-ws-staging"
+# Check current branch
+CURRENT_BRANCH=$(git branch --show-current)
+echo "Current branch: $CURRENT_BRANCH"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+if [ "$CURRENT_BRANCH" != "develop" ]; then
+    echo "⚠️  Warning: Not on develop branch!"
+    echo "Do you want to continue? [y/N]"
+    read -r response
+    if [[ ! "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        echo "Deployment cancelled"
+        exit 1
+    fi
+fi
 
-# Function to print colored output
-print_status() {
-    echo -e "${GREEN}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[$(date +'%Y-%m-%d %H:%M:%S')] ERROR:${NC} $1"
-}
-
-print_warning() {
-    echo -e "${YELLOW}[$(date +'%Y-%m-%d %H:%M:%S')] WARNING:${NC} $1"
-}
-
-# Check if .env.staging exists
-if [ ! -f .env.staging ]; then
-    print_error ".env.staging file not found! Copy .env.staging.example and configure it."
+# Check for uncommitted changes
+if ! git diff-index --quiet HEAD --; then
+    echo "❌ You have uncommitted changes!"
+    echo "Please commit or stash them before deploying"
     exit 1
 fi
 
-# Build the application
-print_status "Building application for staging..."
+# Pull latest changes
+echo ""
+echo "📥 Pulling latest changes..."
+git pull origin develop
+
+# Install dependencies
+echo ""
+echo "📦 Installing dependencies..."
+npm install
+
+# Run tests
+echo ""
+echo "🧪 Running tests..."
+npm run lint
+npm run typecheck
+npm run test:unit
+
+# Build
+echo ""
+echo "🔨 Building application..."
 npm run build
 
-# Create deployment archive
-print_status "Creating deployment archive..."
-tar -czf staging-deploy.tar.gz \
-    .next \
-    public \
-    package.json \
-    package-lock.json \
-    server.js \
-    next.config.js \
-    .env.staging \
-    scripts \
-    lib \
-    app \
-    components \
-    hooks \
-    types \
-    middleware.ts \
-    tsconfig.json
+echo ""
+echo "✅ Pre-deployment checks passed!"
+echo ""
 
-# Upload to staging server
-print_status "Uploading to staging server..."
-scp staging-deploy.tar.gz ${STAGING_USER}@${STAGING_SERVER}:${STAGING_PATH}/
-
-# Execute deployment on staging server
-print_status "Executing deployment on staging server..."
-ssh ${STAGING_USER}@${STAGING_SERVER} << 'ENDSSH'
-cd /var/www/staging.hangjegyzet.ai
-
-# Backup current deployment
-echo "Creating backup of current deployment..."
-if [ -d "current" ]; then
-    mv current backup-$(date +%Y%m%d-%H%M%S)
+# Deploy to Vercel
+echo "🚀 Deploying to Vercel..."
+if [ -f ".vercel/project.json.staging" ]; then
+    # Use staging project
+    mv .vercel/project.json .vercel/project.json.temp
+    mv .vercel/project.json.staging .vercel/project.json
+    vercel --prod
+    mv .vercel/project.json .vercel/project.json.staging
+    mv .vercel/project.json.temp .vercel/project.json
+else
+    # Deploy to preview
+    vercel
 fi
 
-# Extract new deployment
-echo "Extracting new deployment..."
-mkdir current
-tar -xzf staging-deploy.tar.gz -C current/
-rm staging-deploy.tar.gz
-
-# Copy .env.staging to .env
-cd current
-cp .env.staging .env
-
-# Install production dependencies
-echo "Installing dependencies..."
-npm ci --production
-
-# Run database migrations
-echo "Running database migrations..."
-npm run db:migrate
-
-# Restart PM2 processes
-echo "Restarting PM2 processes..."
-pm2 restart hangjegyzet-staging || pm2 start npm --name "hangjegyzet-staging" -- start -- -p 3001
-pm2 restart hangjegyzet-ws-staging || pm2 start server.js --name "hangjegyzet-ws-staging"
-pm2 save
-
-# Clear Redis cache for staging
-echo "Clearing Redis cache..."
-redis-cli -n 1 FLUSHDB
-
-# Verify deployment
-echo "Verifying deployment..."
-curl -f -s -o /dev/null https://staging.hangjegyzet.ai || exit 1
-
-echo "✅ Staging deployment completed successfully!"
-ENDSSH
-
-# Clean up local archive
-rm -f staging-deploy.tar.gz
-
-print_status "✅ Staging deployment completed!"
-print_status "🌐 Staging URL: https://staging.hangjegyzet.ai"
-
-# Run smoke tests
-print_status "Running smoke tests..."
-npm run test:staging || print_warning "Some smoke tests failed"
-
-print_status "🎉 Deployment process finished!"
+echo ""
+echo "✅ Deployment initiated!"
+echo ""
+echo "Check deployment status:"
+echo "1. Vercel Dashboard: https://vercel.com/dashboard"
+echo "2. GitHub Actions: https://github.com/YOUR_USERNAME/hangjegyzet/actions"
+echo ""
+echo "Once deployed, run smoke tests:"
+echo "npm run test:smoke:staging"

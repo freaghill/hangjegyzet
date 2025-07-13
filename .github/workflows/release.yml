@@ -1,0 +1,182 @@
+name: Release Management
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Get previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "No previous tag found, including all commits"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            echo "Generating changelog from $PREVIOUS_TAG to ${{ steps.version.outputs.version }}"
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges ${PREVIOUS_TAG}..HEAD)
+          fi
+          
+          # Categorize commits
+          FEATURES=$(echo "$COMMITS" | grep -E "^- (feat|feature):" || true)
+          FIXES=$(echo "$COMMITS" | grep -E "^- (fix|bugfix):" || true)
+          BREAKING=$(echo "$COMMITS" | grep -E "^- (breaking|BREAKING CHANGE):" || true)
+          DOCS=$(echo "$COMMITS" | grep -E "^- (docs|documentation):" || true)
+          PERF=$(echo "$COMMITS" | grep -E "^- (perf|performance):" || true)
+          OTHER=$(echo "$COMMITS" | grep -vE "^- (feat|feature|fix|bugfix|breaking|BREAKING CHANGE|docs|documentation|perf|performance):" || true)
+          
+          # Build changelog
+          CHANGELOG="# Release ${{ steps.version.outputs.version }}\n\n"
+          CHANGELOG="${CHANGELOG}Release Date: $(date +%Y-%m-%d)\n\n"
+          
+          if [ -n "$BREAKING" ]; then
+            CHANGELOG="${CHANGELOG}## ⚠️ Breaking Changes\n\n${BREAKING}\n\n"
+          fi
+          
+          if [ -n "$FEATURES" ]; then
+            CHANGELOG="${CHANGELOG}## ✨ New Features\n\n${FEATURES}\n\n"
+          fi
+          
+          if [ -n "$FIXES" ]; then
+            CHANGELOG="${CHANGELOG}## 🐛 Bug Fixes\n\n${FIXES}\n\n"
+          fi
+          
+          if [ -n "$PERF" ]; then
+            CHANGELOG="${CHANGELOG}## ⚡ Performance Improvements\n\n${PERF}\n\n"
+          fi
+          
+          if [ -n "$DOCS" ]; then
+            CHANGELOG="${CHANGELOG}## 📚 Documentation\n\n${DOCS}\n\n"
+          fi
+          
+          if [ -n "$OTHER" ]; then
+            CHANGELOG="${CHANGELOG}## 🔧 Other Changes\n\n${OTHER}\n\n"
+          fi
+          
+          # Statistics
+          CHANGELOG="${CHANGELOG}## 📊 Statistics\n\n"
+          CHANGELOG="${CHANGELOG}- Total commits: $(echo "$COMMITS" | wc -l)\n"
+          CHANGELOG="${CHANGELOG}- Contributors: $(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"%an" | sort -u | wc -l)\n"
+          
+          # Save to file
+          echo -e "$CHANGELOG" > CHANGELOG.md
+          
+          # Output for GitHub
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGELOG" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-beta') || contains(steps.version.outputs.version, '-alpha') }}
+          files: |
+            CHANGELOG.md
+
+      - name: Update documentation
+        run: |
+          # Update version in package.json
+          sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.version.outputs.version }}\"/" package.json
+          
+          # Commit if changed
+          if git diff --quiet; then
+            echo "No changes to commit"
+          else
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add package.json
+            git commit -m "chore: update version to ${{ steps.version.outputs.version }}"
+            git push
+          fi
+
+      - name: Notify team
+        uses: 8398a7/action-slack@v3
+        if: always()
+        with:
+          status: ${{ job.status }}
+          text: |
+            🎉 New Release: ${{ steps.version.outputs.version }}
+            
+            View release: https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.version }}
+            
+            Deployment will follow standard pipeline.
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+
+  docker-build:
+    name: Build Docker Image
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=tag
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

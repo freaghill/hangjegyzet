@@ -1,18 +1,26 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { securityMiddleware, applySecurityHeaders } from './middleware/security'
+import { generateNonce } from '@/lib/security/headers'
 
 export async function middleware(request: NextRequest) {
+  // Apply security checks first
+  const securityResponse = await securityMiddleware(request)
+  if (securityResponse) {
+    return securityResponse
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
   
-  // Performance and security headers
-  supabaseResponse.headers.set('X-DNS-Prefetch-Control', 'on')
-  supabaseResponse.headers.set('X-Content-Type-Options', 'nosniff')
-  supabaseResponse.headers.set('X-Frame-Options', 'SAMEORIGIN')
-  supabaseResponse.headers.set('X-XSS-Protection', '1; mode=block')
-  supabaseResponse.headers.set('Referrer-Policy', 'origin-when-cross-origin')
+  // Apply comprehensive security headers
+  supabaseResponse = applySecurityHeaders(supabaseResponse)
+  
+  // Generate and set CSP nonce
+  const nonce = generateNonce()
+  supabaseResponse.headers.set('X-Nonce', nonce)
   
   // Cache control for static assets
   if (request.nextUrl.pathname.startsWith('/_next/static/')) {

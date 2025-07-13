@@ -1,0 +1,847 @@
+{
+  "info": {
+    "name": "Hangjegyzet API",
+    "description": "Complete API collection for Hangjegyzet meeting transcription platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://hangjegyzet.hu/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "meeting_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"securePassword123\",\n  \"name\": \"Test User\",\n  \"companyName\": \"Test Company\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user account"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"securePassword123\",\n  \"name\": \"Test User\",\n  \"companyName\": \"Test Company\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/register",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "register"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Registration successful. Please check your email to verify your account.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/session",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "session"]
+            },
+            "description": "Get current user session"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/auth/session",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["auth", "session"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"userId\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"email\": \"user@example.com\",\n  \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Meetings",
+      "item": [
+        {
+          "name": "Transcribe Meeting",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mode\": \"balanced\",\n  \"language\": \"hu\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meeting_id}}/transcribe",
+              "host": ["{{baseUrl}}"],
+              "path": ["meetings", "{{meeting_id}}", "transcribe"]
+            },
+            "description": "Queue a meeting for transcription"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"mode\": \"balanced\",\n  \"language\": \"hu\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/meetings/{{meeting_id}}/transcribe",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["meetings", "{{meeting_id}}", "transcribe"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"jobId\": \"job_123456789\",\n  \"estimatedTime\": 300\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Annotations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meeting_id}}/annotations",
+              "host": ["{{baseUrl}}"],
+              "path": ["meetings", "{{meeting_id}}", "annotations"]
+            },
+            "description": "Get all annotations for a meeting"
+          }
+        },
+        {
+          "name": "Add Annotation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"timestamp\": 125.5,\n  \"text\": \"Important point discussed here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meeting_id}}/annotations",
+              "host": ["{{baseUrl}}"],
+              "path": ["meetings", "{{meeting_id}}", "annotations"]
+            },
+            "description": "Add a new annotation to a meeting"
+          }
+        },
+        {
+          "name": "Share Meeting",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"expiresIn\": 168,\n  \"permissions\": [\"view\", \"comment\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meeting_id}}/share",
+              "host": ["{{baseUrl}}"],
+              "path": ["meetings", "{{meeting_id}}", "share"]
+            },
+            "description": "Generate a shareable link for a meeting"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"expiresIn\": 168,\n  \"permissions\": [\"view\", \"comment\"]\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/meetings/{{meeting_id}}/share",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["meetings", "{{meeting_id}}", "share"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"shareUrl\": \"https://hangjegyzet.hu/share/abc123xyz\",\n  \"token\": \"abc123xyz\",\n  \"expiresAt\": \"2024-01-15T10:30:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Extract Action Items",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/{{meeting_id}}/ai/extract-actions",
+              "host": ["{{baseUrl}}"],
+              "path": ["meetings", "{{meeting_id}}", "ai", "extract-actions"]
+            },
+            "description": "Use AI to extract action items from meeting"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/meetings/{{meeting_id}}/ai/extract-actions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["meetings", "{{meeting_id}}", "ai", "extract-actions"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"actions\": [\n    {\n      \"description\": \"Prepare quarterly report\",\n      \"assignee\": \"John Doe\",\n      \"dueDate\": \"2024-01-15\",\n      \"priority\": \"high\"\n    },\n    {\n      \"description\": \"Schedule follow-up meeting\",\n      \"assignee\": \"Jane Smith\",\n      \"dueDate\": \"2024-01-10\",\n      \"priority\": \"medium\"\n    }\n  ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Meeting",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/audio.mp3"
+                },
+                {
+                  "key": "title",
+                  "value": "Team Meeting - January 2024",
+                  "type": "text"
+                },
+                {
+                  "key": "language",
+                  "value": "hu",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/meetings/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["meetings", "upload"]
+            },
+            "description": "Upload audio/video file for new meeting"
+          }
+        },
+        {
+          "name": "Search Meetings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/meetings/search?q=quarterly&from=2024-01-01&to=2024-12-31&speaker=John",
+              "host": ["{{baseUrl}}"],
+              "path": ["meetings", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "quarterly",
+                  "description": "Search query"
+                },
+                {
+                  "key": "from",
+                  "value": "2024-01-01",
+                  "description": "Start date"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-12-31",
+                  "description": "End date"
+                },
+                {
+                  "key": "speaker",
+                  "value": "John",
+                  "description": "Filter by speaker"
+                }
+              ]
+            },
+            "description": "Search meetings with filters"
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Features",
+      "item": [
+        {
+          "name": "Get Meeting Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ai/analytics?meetingId={{meeting_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "analytics"],
+              "query": [
+                {
+                  "key": "meetingId",
+                  "value": "{{meeting_id}}"
+                }
+              ]
+            },
+            "description": "Get AI-generated analytics for a meeting"
+          }
+        },
+        {
+          "name": "Generate Analytics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"meetingId\": \"{{meeting_id}}\",\n  \"analysisType\": \"engagement\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "analytics"]
+            },
+            "description": "Generate specific type of analytics"
+          }
+        },
+        {
+          "name": "Get AI Predictions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"meetingId\": \"{{meeting_id}}\",\n  \"predictionType\": \"outcomes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/predictions",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "predictions"]
+            },
+            "description": "Get AI predictions for meeting outcomes"
+          }
+        },
+        {
+          "name": "Generate Briefing",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"meetingIds\": [\"{{meeting_id}}\"],\n  \"format\": \"executive_summary\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/ai/briefing",
+              "host": ["{{baseUrl}}"],
+              "path": ["ai", "briefing"]
+            },
+            "description": "Generate AI briefing summary"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Real-time",
+      "item": [
+        {
+          "name": "Get WebSocket Connection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/realtime/connect",
+              "host": ["{{baseUrl}}"],
+              "path": ["realtime", "connect"]
+            },
+            "description": "Get WebSocket connection details for real-time features"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/realtime/connect",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["realtime", "connect"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"url\": \"wss://realtime.hangjegyzet.hu\",\n  \"token\": \"rt_token_123456\",\n  \"protocols\": [\"v1\", \"v2\"]\n}"
+            }
+          ]
+        },
+        {
+          "name": "Stream Audio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/octet-stream"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "Binary audio data..."
+            },
+            "url": {
+              "raw": "{{baseUrl}}/realtime/audio",
+              "host": ["{{baseUrl}}"],
+              "path": ["realtime", "audio"]
+            },
+            "description": "Stream audio for real-time processing"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Integrations",
+      "item": [
+        {
+          "name": "Zoom Auth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/integrations/zoom/auth?redirect=/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["integrations", "zoom", "auth"],
+              "query": [
+                {
+                  "key": "redirect",
+                  "value": "/dashboard"
+                }
+              ]
+            },
+            "description": "Initiate Zoom OAuth flow"
+          }
+        },
+        {
+          "name": "List Zoom Recordings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/integrations/zoom/recordings?from=2024-01-01&to=2024-01-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["integrations", "zoom", "recordings"],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "to",
+                  "value": "2024-01-31"
+                }
+              ]
+            },
+            "description": "Get list of Zoom recordings"
+          }
+        },
+        {
+          "name": "Google Drive Auth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/integrations/google-drive/auth",
+              "host": ["{{baseUrl}}"],
+              "path": ["integrations", "google-drive", "auth"]
+            },
+            "description": "Initiate Google Drive OAuth"
+          }
+        },
+        {
+          "name": "Sync Google Drive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"folderId\": \"drive_folder_123\",\n  \"syncMode\": \"bidirectional\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/integrations/google-drive/sync",
+              "host": ["{{baseUrl}}"],
+              "path": ["integrations", "google-drive", "sync"]
+            },
+            "description": "Sync files with Google Drive"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"professional\",\n  \"billingPeriod\": \"monthly\",\n  \"paymentMethod\": \"card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscriptions", "create"]
+            },
+            "description": "Create a new subscription"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"plan\": \"professional\",\n  \"billingPeriod\": \"monthly\",\n  \"paymentMethod\": \"card\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/subscriptions/create",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["subscriptions", "create"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"paymentUrl\": \"https://pay.barion.com/pay/abc123\",\n  \"transactionId\": \"txn_123456\",\n  \"subscriptionId\": \"sub_789012\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/subscription/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["subscription", "cancel"]
+            },
+            "description": "Cancel current subscription"
+          }
+        },
+        {
+          "name": "Get Billing Portal",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/billing/portal",
+              "host": ["{{baseUrl}}"],
+              "path": ["billing", "portal"]
+            },
+            "description": "Get billing portal URL"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get System Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/monitoring/system",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "monitoring", "system"]
+            },
+            "description": "Get detailed system metrics (admin only)"
+          }
+        },
+        {
+          "name": "Get Usage Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/monitoring/usage",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "monitoring", "usage"]
+            },
+            "description": "Get platform usage statistics"
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "List all users (admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check API health status",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [
+            {
+              "name": "Healthy",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/health",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["health"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\",\n  \"checks\": {\n    \"api\": true,\n    \"database\": true,\n    \"cache\": true,\n    \"storage\": true\n  },\n  \"timestamp\": \"2024-01-08T10:30:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Liveness Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/live",
+              "host": ["{{baseUrl}}"],
+              "path": ["health", "live"]
+            },
+            "description": "Kubernetes liveness probe",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Readiness Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health/ready",
+              "host": ["{{baseUrl}}"],
+              "path": ["health", "ready"]
+            },
+            "description": "Kubernetes readiness probe",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script to ensure authentication",
+          "if (!pm.variables.get('access_token') && pm.info.requestName !== 'Register User' && pm.info.requestName !== 'Health Check') {",
+          "    console.log('No access token found. Please authenticate first.');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script",
+          "pm.test('Status code is 2xx', function () {",
+          "    pm.expect(pm.response.code).to.be.below(300);",
+          "});",
+          "",
+          "pm.test('Response time is less than 2000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "pm.test('Response has Content-Type header', function () {",
+          "    pm.response.to.have.header('Content-Type');",
+          "});"
+        ]
+      }
+    }
+  ]
+}

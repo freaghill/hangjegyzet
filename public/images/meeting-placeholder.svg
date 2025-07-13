@@ -1,0 +1,6 @@
+<svg width="640" height="360" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="360" fill="#1f2937"/>
+  <rect x="280" y="150" width="80" height="60" rx="4" fill="#4b5563"/>
+  <polygon points="380,180 420,160 420,200" fill="#4b5563"/>
+  <text x="50%" y="70%" text-anchor="middle" fill="#9ca3af" font-family="system-ui" font-size="16">Nincs előnézet</text>
+</svg>

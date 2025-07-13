@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import { Logo } from '@/components/ui/logo'
 import { ModeBasedPricingPreview } from '@/components/landing/mode-based-pricing-preview'
+import { HeroSection } from '@/components/landing/hero-section'
+import { FeaturesSection } from '@/components/landing/features-section'
+import { TestimonialsSection } from '@/components/landing/testimonials-section'
+import { FAQSection } from '@/components/landing/faq-section'
+import { TrustBadges } from '@/components/landing/trust-badges'
 
 export default function HomePage() {
   return (
@@ -36,116 +41,13 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold text-gray-900 tracking-tight sm:text-6xl leading-tight">
-              Soha többé ne veszítsen el
-              <br />
-              <span className="text-blue-600">egyetlen fontos részletet sem</span>
-            </h1>
-            <p className="mt-6 text-xl text-gray-600 max-w-3xl mx-auto">
-              A HangJegyzet automatikusan rögzíti és összefoglalja meeting-jeit. 
-              <strong>Spóroljon 30 percet minden megbeszélés után</strong> - nem kell jegyzetelnie.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6">
-              <Link 
-                href="/register" 
-                className="rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-colors"
-              >
-                14 napos próba ingyen
-              </Link>
-              <Link 
-                href="#mukodes" 
-                className="text-base font-semibold leading-6 text-gray-900"
-              >
-                Hogyan működik? <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
-      {/* Value Proposition */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-blue-600">97%+</div>
-              <div className="text-lg font-semibold mt-2">Pontosság</div>
-              <div className="text-gray-600 mt-1">Magyar nyelven is</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-blue-600">30 perc</div>
-              <div className="text-lg font-semibold mt-2">Megtakarítás</div>
-              <div className="text-gray-600 mt-1">Minden meeting után</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-blue-600">9,990 Ft</div>
-              <div className="text-lg font-semibold mt-2">-tól havonta</div>
-              <div className="text-gray-600 mt-1">Kisvállalkozásoknak</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Trust Badges */}
+      <TrustBadges />
 
       {/* Features */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900">
-              Miért válassza a HangJegyzetet?
-            </h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Konkrét előnyök az Ön vállalkozása számára
-            </p>
-          </div>
-          <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-1000"></div>
-              <div className="relative bg-white p-8 rounded-2xl shadow-sm">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl">🎯</span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Soha többé félreértés
-                </h3>
-                <p className="text-gray-600">
-                  <strong>97%+ pontosság magyar nyelven</strong> - minden szakszó, minden részlet pontosan rögzítve. Véget vetünk a "nem ezt mondtam" vitáknak.
-                </p>
-              </div>
-            </div>
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-1000"></div>
-              <div className="relative bg-white p-8 rounded-2xl shadow-sm">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl">⚡</span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  30 perc időmegtakarítás
-                </h3>
-                <p className="text-gray-600">
-                  <strong>Automatikus jegyzőkönyv 2 percen belül</strong> - strukturálva, teendőkkel, döntésekkel. Többé nem kell jegyzetelnie.
-                </p>
-              </div>
-            </div>
-            <div className="relative group">
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 to-emerald-600 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-1000"></div>
-              <div className="relative bg-white p-8 rounded-2xl shadow-sm">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <span className="text-2xl">🔒</span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  100% GDPR-konform
-                </h3>
-                <p className="text-gray-600">
-                  <strong>Európai szerverek, magyar adatvédelem</strong> - Nyugodtan rögzíthet bizalmas megbeszéléseket is.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <FeaturesSection />
 
       {/* Use Cases */}
       <section className="py-24 bg-white">
@@ -195,6 +97,9 @@ export default function HomePage() {
 
       {/* Mode Based Pricing Preview */}
       <ModeBasedPricingPreview />
+      
+      {/* Testimonials */}
+      <TestimonialsSection />
 
       {/* How it works */}
       <section id="mukodes" className="py-24">
@@ -368,6 +273,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* CTA */}
       <section className="py-24">

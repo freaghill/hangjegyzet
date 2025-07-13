@@ -1,0 +1,307 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual deployment'
+        required: true
+      skip_tests:
+        description: 'Skip tests (emergency only)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+env:
+  NODE_VERSION: '18.x'
+  PNPM_VERSION: '8'
+  PRODUCTION_URL: 'https://hangjegyzet.hu'
+
+jobs:
+  pre-deploy-checks:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check deployment conditions
+        id: check
+        run: |
+          # Check if this is a hotfix or regular deployment
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual deployment requested: ${{ github.event.inputs.reason }}"
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            # Check if there are actual changes to deploy
+            CHANGES=$(git diff HEAD~1 --name-only | grep -E '\.(ts|tsx|js|jsx|json|yml|yaml)$' | wc -l)
+            if [ $CHANGES -gt 0 ]; then
+              echo "Found $CHANGES changed files"
+              echo "should_deploy=true" >> $GITHUB_OUTPUT
+            else
+              echo "No deployable changes found"
+              echo "should_deploy=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+  test:
+    name: Production Tests
+    needs: [pre-deploy-checks]
+    if: needs.pre-deploy-checks.outputs.should_deploy == 'true' && github.event.inputs.skip_tests != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run all tests
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.PRODUCTION_NEXTAUTH_SECRET }}
+        run: |
+          pnpm lint
+          pnpm typecheck
+          pnpm test:unit
+          pnpm test:integration
+
+      - name: Run security audit
+        run: pnpm audit --production
+
+  deploy:
+    name: Deploy to Production
+    needs: [pre-deploy-checks, test]
+    if: needs.pre-deploy-checks.outputs.should_deploy == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ env.PRODUCTION_URL }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --production
+
+      - name: Build application
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+          NEXTAUTH_URL: ${{ env.PRODUCTION_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.PRODUCTION_NEXTAUTH_SECRET }}
+          NEXT_PUBLIC_APP_URL: ${{ env.PRODUCTION_URL }}
+          NODE_ENV: production
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: |
+          pnpm build
+          pnpm next telemetry disable
+
+      - name: Create database backup
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: |
+          BACKUP_NAME="backup-$(date +%Y%m%d-%H%M%S).sql"
+          echo "Creating database backup: $BACKUP_NAME"
+          # This is a placeholder - implement actual backup strategy
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+        run: |
+          # Create migration backup
+          pnpm prisma migrate status
+          
+          # Deploy migrations
+          pnpm prisma migrate deploy
+          
+          # Generate Prisma client
+          pnpm prisma generate
+
+      - name: Deploy to Vercel
+        id: deploy
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID_PRODUCTION }}
+          vercel-args: '--prod'
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Purge CDN cache
+        run: |
+          # Purge Cloudflare cache
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
+
+      - name: Create deployment record
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const deployment = await github.rest.repos.createDeployment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.sha,
+              environment: 'production',
+              description: 'Production deployment',
+              auto_merge: false,
+              required_contexts: [],
+              production_environment: true
+            });
+            
+            await github.rest.repos.createDeploymentStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              deployment_id: deployment.data.id,
+              state: 'success',
+              environment_url: '${{ env.PRODUCTION_URL }}',
+              description: 'Deployment successful'
+            });
+
+      - name: Run smoke tests
+        run: |
+          npm install -g wait-on
+          wait-on ${{ env.PRODUCTION_URL }} -t 60000
+          pnpm test:smoke:production
+
+      - name: Check deployment health
+        run: |
+          # Health check
+          curl -f ${{ env.PRODUCTION_URL }}/api/health || exit 1
+          
+          # Check critical pages
+          curl -f ${{ env.PRODUCTION_URL }} || exit 1
+          curl -f ${{ env.PRODUCTION_URL }}/login || exit 1
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+        with:
+          environment: production
+          version: ${{ github.sha }}
+          set_commits: auto
+
+      - name: Notify team
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Production Deployment ${{ job.status }}
+            Version: ${{ github.sha }}
+            Author: ${{ github.actor }}
+            Reason: ${{ github.event.inputs.reason || 'Automatic deployment' }}
+            URL: ${{ env.PRODUCTION_URL }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+          
+      - name: Create release notes
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: commits } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: context.payload.before || 'HEAD~1',
+              head: context.sha
+            });
+            
+            const releaseNotes = commits.commits.map(commit => {
+              return `- ${commit.commit.message.split('\n')[0]} (${commit.sha.substring(0, 7)})`;
+            }).join('\n');
+            
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${new Date().toISOString().split('T')[0]}-${context.sha.substring(0, 7)}`,
+              name: `Production Release ${new Date().toISOString().split('T')[0]}`,
+              body: `## Changes\n\n${releaseNotes}`,
+              draft: false,
+              prerelease: false
+            });
+
+  rollback:
+    name: Rollback Plan
+    needs: [deploy]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Rollback notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: |
+            ⚠️ Production deployment failed!
+            
+            Rollback instructions:
+            1. Revert to previous deployment in Vercel dashboard
+            2. Run database rollback if migrations were applied
+            3. Clear CDN cache
+            4. Monitor error rates
+            
+            Last stable version: ${{ github.event.before }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}

@@ -1,139 +1,215 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { generateMeetingPDF } from '@/lib/export/pdf-generator'
-import { generateMeetingWord } from '@/lib/export/word-generator'
-import { withRateLimit } from '@/lib/security/rate-limiter'
-import { withAuditLog, AuditEvents } from '@/lib/security/audit-logger'
+import { ExportService } from '@/lib/export/export-service'
+import { ExportOptions } from '@/lib/export/types'
+import { z } from 'zod'
 
-async function handler(
+const exportOptionsSchema = z.object({
+  format: z.enum(['pdf', 'docx', 'txt']),
+  template: z.enum(['legal', 'business', 'medical', 'custom']),
+  includeBranding: z.boolean().default(true),
+  includeTranscript: z.boolean().default(true),
+  includeSummary: z.boolean().default(true),
+  includeActionItems: z.boolean().default(true),
+  includeMetadata: z.boolean().default(true),
+  language: z.enum(['hu', 'en']).optional().default('hu')
+})
+
+export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    // Validate meeting ID format (UUID)
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    if (!params.id || !uuidRegex.test(params.id)) {
-      return NextResponse.json(
-        { error: 'Invalid meeting ID format' },
-        { status: 400 }
-      )
-    }
-
     const supabase = await createClient()
     
     // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get format from query params
-    const { searchParams } = new URL(request.url)
-    const format = searchParams.get('format') || 'pdf'
-    
-    if (!['pdf', 'docx'].includes(format)) {
-      return NextResponse.json(
-        { error: 'Invalid format. Use pdf or docx' },
-        { status: 400 }
-      )
-    }
+    // Parse request body
+    const body = await request.json()
+    const options = exportOptionsSchema.parse(body)
 
     // Get meeting data
     const { data: meeting, error: meetingError } = await supabase
       .from('meetings')
-      .select('*')
+      .select(`
+        *,
+        profiles!meetings_user_id_fkey (
+          full_name,
+          email
+        )
+      `)
       .eq('id', params.id)
       .single()
 
     if (meetingError || !meeting) {
-      return NextResponse.json(
-        { error: 'Meeting not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: 'Meeting not found' }, { status: 404 })
     }
 
-    // Check user has access to this meeting
-    const { data: member } = await supabase
-      .from('organization_members')
-      .select('role')
-      .eq('organization_id', meeting.organization_id)
-      .eq('user_id', user.id)
+    // Check access
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', user.id)
       .single()
 
-    if (!member) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      )
+    if (profile?.organization_id !== meeting.organization_id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    // Get organization branding
+    const { data: organization } = await supabase
+      .from('organizations')
+      .select('*')
+      .eq('id', meeting.organization_id)
+      .single()
+
+    const organizationBranding = organization?.branding || {
+      companyName: organization?.name,
+      primaryColor: '#2563eb',
+      includeContactInfo: true,
+      contactInfo: {
+        email: organization?.contact_email,
+        phone: organization?.contact_phone,
+        website: organization?.website,
+        address: organization?.address
+      }
+    }
+
+    // Get action items
+    const { data: actionItems } = await supabase
+      .from('action_items')
+      .select('*')
+      .eq('meeting_id', params.id)
+      .order('created_at', { ascending: true })
+
     // Prepare meeting data for export
-    const exportData = {
+    const meetingData = {
       id: meeting.id,
-      title: meeting.title || 'Névtelen találkozó',
+      title: meeting.title,
       date: new Date(meeting.created_at),
       duration: meeting.duration_seconds || 0,
       participants: meeting.speakers?.map((s: any) => s.name) || [],
-      transcript: meeting.transcript?.segments?.map((s: any) => ({
-        speaker: s.speaker || 'Ismeretlen',
-        text: s.text,
-        timestamp: s.start * 1000 // Convert to milliseconds
-      })) || [{
-        speaker: 'Átirat',
-        text: meeting.transcript?.text || 'Átirat nem elérhető',
-        timestamp: 0
-      }],
+      transcript: meeting.transcript,
       summary: meeting.summary,
-      actionItems: meeting.action_items || [],
-      keyPoints: meeting.metadata?.keyPoints || [],
-      sentiment: meeting.metadata?.sentiment ? {
-        overall: meeting.metadata.sentiment,
-        distribution: {
-          positive: 33,
-          neutral: 34,
-          negative: 33
-        }
-      } : undefined
+      actionItems: actionItems?.map(item => ({
+        task: item.description,
+        assignee: item.assignee,
+        deadline: item.due_date,
+        priority: item.priority
+      })) || [],
+      metadata: {
+        mode: meeting.transcription_mode,
+        language: meeting.language,
+        createdBy: meeting.profiles?.full_name || meeting.profiles?.email
+      }
     }
 
-    // Generate document
-    let blob: Blob
-    let contentType: string
-    let filename: string
+    // Export document
+    const exportService = new ExportService()
+    const result = await exportService.export(
+      meetingData,
+      options as ExportOptions,
+      organizationBranding
+    )
 
-    if (format === 'pdf') {
-      blob = await generateMeetingPDF(exportData)
-      contentType = 'application/pdf'
-      filename = `${meeting.title || 'meeting'}-${meeting.id}.pdf`
-    } else {
-      blob = await generateMeetingWord(exportData)
-      contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      filename = `${meeting.title || 'meeting'}-${meeting.id}.docx`
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error || 'Export failed' },
+        { status: 500 }
+      )
     }
 
-    // Convert blob to buffer
-    const buffer = await blob.arrayBuffer()
-
-    // Return file
-    return new NextResponse(buffer, {
+    // Return the file
+    return new NextResponse(result.buffer, {
       headers: {
-        'Content-Type': contentType,
-        'Content-Disposition': `attachment; filename="${filename}"`,
-        'Content-Length': String(buffer.byteLength)
+        'Content-Type': result.mimeType,
+        'Content-Disposition': `attachment; filename="${result.filename}"`,
+        'Cache-Control': 'no-cache'
       }
     })
 
   } catch (error) {
     console.error('Export error:', error)
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid export options', details: error.errors },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
-      { error: 'Failed to export meeting' },
+      { error: 'Export failed' },
       { status: 500 }
     )
   }
 }
 
-// Export with rate limiting and audit logging
-export const GET = withRateLimit(
-  withAuditLog(handler, AuditEvents.MEETING_EXPORT, 'meeting'),
-  'export'
-)
+// Get available export options
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = await createClient()
+    
+    // Check authentication
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check meeting exists and user has access
+    const { data: meeting } = await supabase
+      .from('meetings')
+      .select('organization_id')
+      .eq('id', params.id)
+      .single()
+
+    if (!meeting) {
+      return NextResponse.json({ error: 'Meeting not found' }, { status: 404 })
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.organization_id !== meeting.organization_id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    // Return available export options
+    return NextResponse.json({
+      formats: [
+        { value: 'pdf', label: 'PDF', description: 'Portable Document Format' },
+        { value: 'docx', label: 'Word', description: 'Microsoft Word dokumentum' },
+        { value: 'txt', label: 'Szöveg', description: 'Egyszerű szöveges fájl' }
+      ],
+      templates: [
+        { value: 'business', label: 'Üzleti', description: 'Általános üzleti meetingekhez' },
+        { value: 'legal', label: 'Jogi', description: 'Jogi konzultációkhoz' },
+        { value: 'medical', label: 'Egészségügyi', description: 'Orvosi konzultációkhoz' },
+        { value: 'custom', label: 'Egyéni', description: 'Testreszabható sablon' }
+      ],
+      options: {
+        includeBranding: true,
+        includeTranscript: true,
+        includeSummary: true,
+        includeActionItems: true,
+        includeMetadata: true
+      }
+    })
+  } catch (error) {
+    console.error('Get export options error:', error)
+    return NextResponse.json(
+      { error: 'Failed to get export options' },
+      { status: 500 }
+    )
+  }
+}
