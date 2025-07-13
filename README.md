@@ -2,6 +2,8 @@
 
 AI-powered meeting transcription and insights platform for Hungarian businesses.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/freaghill/hangjegyzet)
+
 **🚀 Status: Pre-launch (30 days to go)**  
 **🎯 Goal: 100 paying customers in first month**  
 **💰 Unit Economics: €0.65 cost/user, €25+ revenue/user**  
