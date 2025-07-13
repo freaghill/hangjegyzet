@@ -1,7 +1,3 @@
-import { Analytics } from '@vercel/analytics/react'
-import { SpeedInsights } from '@vercel/speed-insights/next'
-import React from 'react'
-
 // Custom event tracking
 export interface CustomEvent {
   name: string
@@ -9,264 +5,89 @@ export interface CustomEvent {
 }
 
 // Track custom events
-export function trackEvent(event: CustomEvent) {
-  if (typeof window !== 'undefined' && window.va) {
-    window.va('event', event.name, event.properties)
+export function track(event: CustomEvent) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', event.name, event.properties)
   }
 }
 
-// Business metrics events
-export const BusinessEvents = {
-  // User events
-  USER_SIGNUP: 'user_signup',
-  USER_LOGIN: 'user_login',
-  USER_UPGRADED: 'user_upgraded',
-  USER_CHURNED: 'user_churned',
+// Track page views
+export function trackPageView(url: string) {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('config', process.env.NEXT_PUBLIC_GA_ID!, {
+      page_path: url,
+    })
+  }
+}
+
+// Track errors
+export function trackError(error: Error | string, context?: Record<string, any>) {
+  const errorMessage = typeof error === 'string' ? error : error.message
   
-  // Meeting events
-  MEETING_CREATED: 'meeting_created',
-  MEETING_UPLOADED: 'meeting_uploaded',
-  MEETING_TRANSCRIBED: 'meeting_transcribed',
-  MEETING_SHARED: 'meeting_shared',
-  MEETING_EXPORTED: 'meeting_exported',
-  
-  // Team events
-  TEAM_CREATED: 'team_created',
-  TEAM_MEMBER_INVITED: 'team_member_invited',
-  TEAM_MEMBER_JOINED: 'team_member_joined',
-  
-  // Payment events
-  PAYMENT_INITIATED: 'payment_initiated',
-  PAYMENT_COMPLETED: 'payment_completed',
-  PAYMENT_FAILED: 'payment_failed',
-  SUBSCRIPTION_CREATED: 'subscription_created',
-  SUBSCRIPTION_CANCELLED: 'subscription_cancelled',
-  
-  // Feature usage
-  FEATURE_USED: 'feature_used',
-  INTEGRATION_CONNECTED: 'integration_connected',
-  SEARCH_PERFORMED: 'search_performed',
-  EXPORT_GENERATED: 'export_generated',
-  AI_FEATURE_USED: 'ai_feature_used',
+  track({
+    name: 'error',
+    properties: {
+      error_message: errorMessage,
+      error_stack: typeof error === 'object' ? error.stack : undefined,
+      ...context,
+    },
+  })
+}
+
+// Track performance metrics
+export function trackPerformance(metric: {
+  name: string
+  value: number
+  label?: string
+}) {
+  track({
+    name: 'performance',
+    properties: {
+      metric_name: metric.name,
+      metric_value: metric.value,
+      metric_label: metric.label,
+    },
+  })
+}
+
+// Track user actions
+export function trackAction(action: string, category: string, label?: string, value?: number) {
+  track({
+    name: action,
+    properties: {
+      event_category: category,
+      event_label: label,
+      value,
+    },
+  })
 }
 
 // Track business metrics
-export function trackBusinessMetric(
-  event: string,
-  properties?: {
-    value?: number
-    currency?: string
-    plan?: string
-    feature?: string
-    source?: string
-    [key: string]: any
-  }
-) {
-  trackEvent({
-    name: event,
+export function trackBusinessMetric(metric: {
+  name: string
+  value: number
+  unit?: string
+  metadata?: Record<string, any>
+}) {
+  track({
+    name: 'business_metric',
     properties: {
-      ...properties,
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV,
+      metric_name: metric.name,
+      metric_value: metric.value,
+      metric_unit: metric.unit,
+      ...metric.metadata,
     },
   })
 }
 
-// Revenue tracking
-export function trackRevenue(
-  amount: number,
-  currency: string = 'HUF',
-  properties?: {
-    plan?: string
-    billing_period?: 'monthly' | 'yearly'
-    payment_method?: string
-    [key: string]: any
-  }
-) {
-  trackBusinessMetric(BusinessEvents.PAYMENT_COMPLETED, {
-    value: amount,
-    currency,
-    ...properties,
-  })
-}
-
-// Feature usage tracking
-export function trackFeatureUsage(
-  feature: string,
-  properties?: {
-    duration?: number
-    success?: boolean
-    error?: string
-    [key: string]: any
-  }
-) {
-  trackBusinessMetric(BusinessEvents.FEATURE_USED, {
-    feature,
-    ...properties,
-  })
-}
-
-// Page view tracking with custom properties
-export function trackPageView(
-  path: string,
-  properties?: {
-    referrer?: string
-    search?: string
-    user_type?: 'anonymous' | 'free' | 'paid'
-    [key: string]: any
-  }
-) {
-  if (typeof window !== 'undefined' && window.va) {
-    window.va('pageview', {
-      path,
-      ...properties,
-    })
-  }
-}
-
-// Session tracking
-export function trackSession(
-  sessionId: string,
-  properties?: {
-    duration?: number
-    page_views?: number
-    events?: number
-    [key: string]: any
-  }
-) {
-  trackEvent({
-    name: 'session_end',
+// Track conversion events
+export function trackConversion(type: string, value?: number, metadata?: Record<string, any>) {
+  track({
+    name: 'conversion',
     properties: {
-      session_id: sessionId,
-      ...properties,
+      conversion_type: type,
+      conversion_value: value,
+      ...metadata,
     },
   })
-}
-
-// Conversion tracking
-export function trackConversion(
-  type: 'signup' | 'upgrade' | 'purchase' | 'custom',
-  properties?: {
-    value?: number
-    from?: string
-    to?: string
-    [key: string]: any
-  }
-) {
-  trackEvent({
-    name: `conversion_${type}`,
-    properties: {
-      ...properties,
-      conversion_time: new Date().toISOString(),
-    },
-  })
-}
-
-// A/B test tracking
-export function trackExperiment(
-  experimentId: string,
-  variant: string,
-  properties?: Record<string, any>
-) {
-  trackEvent({
-    name: 'experiment_viewed',
-    properties: {
-      experiment_id: experimentId,
-      variant,
-      ...properties,
-    },
-  })
-}
-
-// Error tracking (complement to Sentry)
-export function trackError(
-  error: string,
-  properties?: {
-    severity?: 'low' | 'medium' | 'high' | 'critical'
-    category?: string
-    [key: string]: any
-  }
-) {
-  trackEvent({
-    name: 'error_occurred',
-    properties: {
-      error,
-      ...properties,
-    },
-  })
-}
-
-// Performance tracking
-export function trackPerformance(
-  metric: string,
-  value: number,
-  properties?: {
-    unit?: string
-    category?: string
-    [key: string]: any
-  }
-) {
-  trackEvent({
-    name: 'performance_metric',
-    properties: {
-      metric,
-      value,
-      ...properties,
-    },
-  })
-}
-
-// Analytics provider component
-export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <Analytics 
-        beforeSend={(event) => {
-          // Add custom properties to all events
-          return {
-            ...event,
-            properties: {
-              ...event.properties,
-              app_version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
-              deployment_id: process.env.VERCEL_DEPLOYMENT_ID,
-            }
-          }
-        }}
-      />
-      <SpeedInsights />
-      {children}
-    </>
-  )
-}
-
-// Custom hooks for analytics
-import { useEffect } from 'react'
-import { usePathname, useSearchParams } from 'next/navigation'
-
-export function usePageTracking() {
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-
-  useEffect(() => {
-    trackPageView(pathname, {
-      search: searchParams.toString(),
-    })
-  }, [pathname, searchParams])
-}
-
-export function useEventTracking() {
-  return {
-    track: trackEvent,
-    trackBusiness: trackBusinessMetric,
-    trackFeature: trackFeatureUsage,
-    trackConversion,
-    trackError,
-  }
-}
-
-// Augment window type
-declare global {
-  interface Window {
-    va?: (command: string, ...args: any[]) => void
-  }
 }

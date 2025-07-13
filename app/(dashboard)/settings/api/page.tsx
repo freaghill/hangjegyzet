@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import { Plus, Key, Copy, Trash2, Eye, EyeOff } from 'lucide-react'
-import { apiKeyManager, ApiKey } from '@/lib/api/keys'
+import { type ApiKey, generateApiKey, listApiKeys, revokeApiKey } from '@/lib/api/keys-client'
 import { useOrganization } from '@/hooks/useOrganization'
 import { createClient } from '@/lib/supabase/client'
 import {

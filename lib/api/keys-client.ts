@@ -5,79 +5,46 @@ export interface ApiKey {
   permissions: {
     meetings?: string[]
     transcripts?: string[]
+    exports?: string[]
+    analytics?: string[]
   }
-  rateLimit: number
-  isActive: boolean
-  lastUsedAt?: string
-  expiresAt?: string
-  createdAt: string
+  lastUsed?: Date
+  createdAt: Date
+  expiresAt?: Date
 }
 
-// Client-side API key functions that call the API endpoints
-export const apiKeyClient = {
-  async listKeys(): Promise<ApiKey[]> {
-    const response = await fetch('/api/settings/api-keys')
-    if (!response.ok) {
-      throw new Error('Failed to fetch API keys')
-    }
-    const data = await response.json()
-    return data.keys
-  },
+export async function generateApiKey(name: string, permissions: ApiKey['permissions']) {
+  const response = await fetch('/api/settings/api-keys', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, permissions })
+  })
+  
+  if (!response.ok) {
+    throw new Error('Failed to generate API key')
+  }
+  
+  return response.json()
+}
 
-  async createKey(name: string, permissions: Record<string, string[]>, rateLimit: number, expiresAt?: string): Promise<{ key: string; keyData: ApiKey }> {
-    const response = await fetch('/api/settings/api-keys', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        permissions,
-        rateLimit,
-        expiresAt,
-      }),
-    })
+export async function listApiKeys() {
+  const response = await fetch('/api/settings/api-keys')
+  
+  if (!response.ok) {
+    throw new Error('Failed to list API keys')
+  }
+  
+  return response.json()
+}
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to create API key')
-    }
-
-    return response.json()
-  },
-
-  async updateKey(keyId: string, updates: Partial<ApiKey>): Promise<ApiKey> {
-    const response = await fetch('/api/settings/api-keys', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        keyId,
-        ...updates,
-      }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to update API key')
-    }
-
-    return response.json()
-  },
-
-  async deleteKey(keyId: string): Promise<void> {
-    const response = await fetch('/api/settings/api-keys', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ keyId }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to delete API key')
-    }
-  },
+export async function revokeApiKey(keyId: string) {
+  const response = await fetch(`/api/settings/api-keys/${keyId}`, {
+    method: 'DELETE'
+  })
+  
+  if (!response.ok) {
+    throw new Error('Failed to revoke API key')
+  }
+  
+  return response.json()
 }
