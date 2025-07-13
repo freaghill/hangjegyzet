@@ -65,6 +65,7 @@
     "@deepgram/sdk": "^4.8.0",
     "@hookform/resolvers": "^3.3.4",
     "@langchain/anthropic": "^0.3.24",
+    "@langchain/core": "^0.3.62",
     "@langchain/openai": "^0.5.18",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@microsoft/microsoft-graph-types": "^2.40.0",
