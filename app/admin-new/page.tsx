@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
-import { checkAdminAuth } from '@/lib/admin/auth'
+import { checkAdminAuthClient } from '@/lib/admin/auth-client'
 import { redirect } from 'next/navigation'
 
 // Dynamically import react-admin to avoid SSR issues
