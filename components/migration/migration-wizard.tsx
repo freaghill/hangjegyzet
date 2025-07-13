@@ -21,7 +21,7 @@ import {
   Shield,
   Gift,
   Zap,
-  BalanceScale,
+  Scale,
   Target
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -411,7 +411,7 @@ export function MigrationWizard({ currentPlan, organizationId, onComplete }: Mig
                             <span>{plan.limits.modeAllocation.fast === -1 ? '∞' : plan.limits.modeAllocation.fast} Fast</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <BalanceScale className="h-4 w-4 text-blue-600" />
+                            <Scale className="h-4 w-4 text-blue-600" />
                             <span>{plan.limits.modeAllocation.balanced} Balanced</span>
                           </div>
                           <div className="flex items-center gap-1">

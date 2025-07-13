@@ -23,7 +23,7 @@ import {
   XCircle,
   Clock,
   Zap,
-  BalanceScale,
+  Scale,
   Target
 } from 'lucide-react'
 import { 

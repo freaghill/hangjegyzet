@@ -10,7 +10,7 @@ import Url from '@uppy/url'
 import Audio from '@uppy/audio'
 import Webcam from '@uppy/webcam'
 import XHRUpload from '@uppy/xhr-upload'
-import { useUppy } from '@uppy/react'
+// import { useUppy } from '@uppy/react' - Not available in this version
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -35,7 +35,7 @@ export function UniversalImporter({ organizationId, onImportComplete }: Universa
   const [importedMeetings, setImportedMeetings] = useState<string[]>([])
   const supabase = createClient()
 
-  const uppy = useUppy(() => {
+  const [uppy] = useState(() => {
     const uppyInstance = new Uppy({
       id: 'universal-importer',
       autoProceed: false,
@@ -93,6 +93,13 @@ export function UniversalImporter({ organizationId, onImportComplete }: Universa
 
     return uppyInstance
   })
+
+  // Cleanup Uppy instance on unmount
+  useEffect(() => {
+    return () => {
+      uppy.close()
+    }
+  }, [uppy])
 
   // Event handlers
   useEffect(() => {

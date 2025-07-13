@@ -316,3 +316,19 @@ export const CREDIT_CONVERSION = {
 }
 
 export type SubscriptionPlan = keyof typeof SUBSCRIPTION_PLANS
+
+// Utility functions
+export function formatPrice(price: number, currency: 'HUF' | 'EUR' = 'HUF'): string {
+  return new Intl.NumberFormat(currency === 'HUF' ? 'hu-HU' : 'en-EU', {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price)
+}
+
+export function calculateYearlyPrice(monthlyPrice: number, discountPercent: number = 20): number {
+  const yearlyTotal = monthlyPrice * 12
+  const discount = yearlyTotal * (discountPercent / 100)
+  return Math.round(yearlyTotal - discount)
+}

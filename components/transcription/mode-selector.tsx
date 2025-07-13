@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Info, Zap, BalanceScale, Target } from 'lucide-react'
+import { Info, Zap, Scale, Target } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { canUseMode, type ModeAllocation } from '@/lib/payments/subscription-plans'
 import type { SubscriptionPlanDetails } from '@/lib/payments/subscription-plans'
@@ -36,7 +36,7 @@ const MODE_OPTIONS: ModeOption[] = [
     description: 'Kiegyensúlyozott mód a legtöbb üzleti megbeszéléshez',
     accuracy: '94-96%',
     bestFor: 'Üzleti meetingek, prezentációk',
-    icon: BalanceScale,
+    icon: Scale,
     color: 'text-blue-600',
     credits: 2,
   },

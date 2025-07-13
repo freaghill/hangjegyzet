@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
-import { Zap, BalanceScale, Target, TrendingUp, AlertCircle } from 'lucide-react'
+import { Zap, Scale, Target, TrendingUp, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
@@ -39,7 +39,7 @@ const MODE_INFO = {
   },
   balanced: {
     name: 'Balanced',
-    icon: BalanceScale,
+    icon: Scale,
     color: 'text-blue-600',
     bgColor: 'bg-blue-50',
     progressColor: 'bg-blue-600',

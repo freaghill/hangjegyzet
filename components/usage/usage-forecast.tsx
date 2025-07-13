@@ -11,7 +11,7 @@ import {
   AlertTriangle, 
   Calendar,
   Zap,
-  BalanceScale,
+  Scale,
   Target,
   ChevronRight
 } from 'lucide-react'
@@ -155,7 +155,7 @@ export function UsageForecast({
   const getModeIcon = (mode: string) => {
     switch (mode) {
       case 'fast': return <Zap className="h-5 w-5 text-green-600" />
-      case 'balanced': return <BalanceScale className="h-5 w-5 text-blue-600" />
+      case 'balanced': return <Scale className="h-5 w-5 text-blue-600" />
       case 'precision': return <Target className="h-5 w-5 text-orange-600" />
     }
   }
@@ -381,7 +381,7 @@ function generateRecommendations(forecasts: Record<string, Forecast>) {
   // Suggest mode optimization
   if (forecasts.precision?.currentUsage > 0 && forecasts.balanced?.currentUsage < forecasts.balanced?.limit * 0.5) {
     recommendations.push({
-      icon: <BalanceScale className="h-5 w-5 text-blue-500" />,
+      icon: <Scale className="h-5 w-5 text-blue-500" />,
       title: 'Optimalizálja a mód használatot',
       description: 'Fontolja meg a Balanced mód használatát a kevésbé kritikus meetingekhez, hogy spóroljon a Precision percekkel.'
     })

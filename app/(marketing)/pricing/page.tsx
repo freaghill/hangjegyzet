@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { Check, X, Zap, BalanceScale, Target, Sparkles, Building2, Shield, Rocket } from 'lucide-react'
+import { Check, X, Zap, Scale, Target, Sparkles, Building2, Shield, Rocket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -224,7 +224,7 @@ export default function PricingPage() {
             />
             
             <ModeCard
-              icon={BalanceScale}
+              icon={Scale}
               name="Balanced Mode"
               accuracy="94-96%"
               speed="2-3 perc"
@@ -515,7 +515,7 @@ function PricingCards({ plans, yearly }: { plans: string[], yearly: boolean }) {
                   <ModeAllocation 
                     mode="Balanced" 
                     minutes={plan.limits.modeAllocation.balanced} 
-                    icon={BalanceScale}
+                    icon={Scale}
                     color="text-blue-600"
                   />
                   <ModeAllocation 
