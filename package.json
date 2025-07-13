@@ -56,7 +56,7 @@
     "load-test:all": "npm run load-test:smoke && npm run load-test:load && npm run load-test:stress && npm run load-test:spike",
     "performance:analyze": "tsx scripts/analyze-performance.ts",
     "performance:report": "tsx scripts/generate-performance-report.ts",
-    "prepare": "husky install",
+    "prepare": "node -e \"if (process.env.CI !== 'true' && process.env.VERCEL !== '1') { require('child_process').execSync('husky install', { stdio: 'inherit' }) }\"",
     "pre-commit": "lint-staged"
   },
   "dependencies": {
