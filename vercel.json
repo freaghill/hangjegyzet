@@ -1,8 +1,7 @@
 {
   "framework": "nextjs",
-  "buildCommand": "pnpm build",
-  "devCommand": "pnpm dev",
-  "installCommand": "pnpm install",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install --legacy-peer-deps",
   "regions": ["fra1"],
   "functions": {
     "app/api/meetings/*/transcribe/route.ts": {
@@ -22,7 +21,7 @@
     },
     {
       "path": "/api/cron/metrics",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 12 * * *"
     }
   ],
   "headers": [
