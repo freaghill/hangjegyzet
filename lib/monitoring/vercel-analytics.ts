@@ -226,9 +226,9 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
             ...event,
             properties: {
               ...event.properties,
-              app_version: process.env.NEXT_PUBLIC_APP_VERSION,
+              app_version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
               deployment_id: process.env.VERCEL_DEPLOYMENT_ID,
-            },
+            }
           }
         }}
       />
