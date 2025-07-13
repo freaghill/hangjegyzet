@@ -6,6 +6,9 @@ const nextConfig = {
   // Enable SWC minification for smaller bundles
   swcMinify: true,
   
+  // Transpile packages that use private fields
+  // transpilePackages: ['undici'],
+  
   // Optimize images
   images: {
     domains: [
@@ -26,6 +29,16 @@ const nextConfig = {
   
   // Configure module aliases
   webpack: (config, { isServer }) => {
+    // Fix for packages with unsupported syntax
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      }
+    }
+    
     // Add bundle analyzer in development
     if (process.env.ANALYZE === 'true') {
       const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin

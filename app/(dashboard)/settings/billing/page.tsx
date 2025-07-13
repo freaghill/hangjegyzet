@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '@/lib/payments/subscription'
+import { SUBSCRIPTION_PLANS, SubscriptionPlan, getSubscriptionPlan } from '@/lib/payments/subscription-plans'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Check, Loader2 } from 'lucide-react'
@@ -158,12 +158,12 @@ export default function BillingPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-xl font-semibold">
-                {SUBSCRIPTION_PLANS[currentPlan].name}
+                {getSubscriptionPlan(currentPlan)?.name || 'Unknown'}
               </h3>
               <p className="text-gray-600 mt-1">
                 {currentPlan === 'trial' 
                   ? 'Próbaidőszak - 14 nap'
-                  : formatPrice(SUBSCRIPTION_PLANS[currentPlan].price) + '/hó'}
+                  : formatPrice(getSubscriptionPlan(currentPlan)?.price || 0) + '/hó'}
               </p>
             </div>
             <Badge variant={currentPlan === 'trial' ? 'secondary' : 'default'}>
@@ -174,20 +174,19 @@ export default function BillingPage() {
       </Card>
 
       {/* Pricing Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {Object.entries(SUBSCRIPTION_PLANS).map(([key, plan]) => {
-          if (key === 'trial') return null
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Object.entries(SUBSCRIPTION_PLANS).filter(([key]) => key !== 'trial' && key !== 'multinational').map(([key, plan]) => {
           const planKey = key as SubscriptionPlan
           const isCurrent = planKey === currentPlan
           
           return (
             <Card 
               key={key} 
-              className={`glass-effect ${planKey === 'professional' ? 'ring-2 ring-blue-600' : ''}`}
+              className={`glass-effect ${plan.popular ? 'ring-2 ring-blue-600' : ''}`}
             >
               <CardHeader>
                 <CardTitle>{plan.name}</CardTitle>
-                {planKey === 'professional' && (
+                {plan.popular && (
                   <Badge className="w-fit">Legnépszerűbb</Badge>
                 )}
               </CardHeader>
@@ -196,10 +195,12 @@ export default function BillingPage() {
                   <p className="text-3xl font-bold">
                     {formatPrice(plan.price)}
                   </p>
-                  <p className="text-sm text-gray-600">/hónap</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Alanyi adómentes - ÁFA tv. 193. §
-                  </p>
+                  <p className="text-sm text-gray-600">/{plan.currency === 'EUR' ? 'hó (EUR)' : 'hónap'}</p>
+                  {plan.currency === 'HUF' && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Alanyi adómentes - ÁFA tv. 193. §
+                    </p>
+                  )}
                 </div>
                 <ul className="space-y-2">
                   {plan.features.map((feature, index) => (
@@ -214,11 +215,10 @@ export default function BillingPage() {
                 <Button
                   className="w-full"
                   variant={isCurrent ? 'outline' : 'default'}
-                  disabled={isCurrent || planKey < currentPlan}
+                  disabled={isCurrent}
                   onClick={() => onSelectPlan(planKey)}
                 >
-                  {isCurrent ? 'Jelenlegi csomag' : 
-                   planKey < currentPlan ? 'Nem elérhető' : 'Választás'}
+                  {isCurrent ? 'Jelenlegi csomag' : 'Választás'}
                 </Button>
               </CardFooter>
             </Card>
@@ -233,7 +233,7 @@ export default function BillingPage() {
             <CardHeader>
               <CardTitle>Számlázási adatok</CardTitle>
               <CardDescription>
-                {SUBSCRIPTION_PLANS[selectedPlan].name} csomag - {formatPrice(SUBSCRIPTION_PLANS[selectedPlan].price)}/hó
+                {getSubscriptionPlan(selectedPlan)?.name || 'Unknown'} csomag - {formatPrice(getSubscriptionPlan(selectedPlan)?.price || 0)}/hó
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit(onSubmitBilling)}>

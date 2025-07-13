@@ -1,7 +1,7 @@
 import Handlebars from 'handlebars'
 import { format, formatDuration as formatDurationFns } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import juice from 'juice'
+// import juice from 'juice' - Removed due to build issues with undici
 
 // Register Handlebars helpers
 Handlebars.registerHelper('formatDate', (date: string | Date, formatStr?: string) => {
@@ -465,8 +465,9 @@ export class TemplateEngine {
     const compiled = this.compileTemplate(templateId, templateString)
     const html = compiled(data)
     
-    // Inline CSS for better email/PDF compatibility
-    return juice(html)
+    // Return HTML directly without CSS inlining
+    // CSS is already included in the template
+    return html
   }
   
   /**
@@ -484,8 +485,9 @@ export class TemplateEngine {
       return html.replace('<style>{{{styles}}}</style>', `<style>${styles}</style>`)
     }
     
-    // Inline CSS for better email/PDF compatibility
-    return juice(html)
+    // Return HTML directly without CSS inlining
+    // CSS is already included in the template
+    return html
   }
   
   /**

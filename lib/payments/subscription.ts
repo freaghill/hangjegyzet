@@ -3,8 +3,6 @@ import { simplePay } from './simplepay'
 import { billingo } from './billingo'
 import { SUBSCRIPTION_PLANS, SubscriptionPlan } from './subscription-plans'
 
-export { SUBSCRIPTION_PLANS, type SubscriptionPlan }
-
 // Remove the duplicate SUBSCRIPTION_PLANS definition
 const _REMOVED_SUBSCRIPTION_PLANS = {
   trial: {

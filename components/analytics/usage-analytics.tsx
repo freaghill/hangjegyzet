@@ -27,7 +27,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts'
-import { AnalyticsService } from '@/lib/analytics/analytics-service'
+import { AnalyticsService } from '@/lib/analytics/analytics-service-client'
 import { UsageStats } from '@/lib/analytics/types'
 
 interface UsageAnalyticsProps {

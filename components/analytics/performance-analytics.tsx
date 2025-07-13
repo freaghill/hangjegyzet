@@ -30,7 +30,7 @@ import {
   ResponsiveContainer,
   ReferenceLine
 } from 'recharts'
-import { AnalyticsService } from '@/lib/analytics/analytics-service'
+import { AnalyticsService } from '@/lib/analytics/analytics-service-client'
 import { PerformanceMetrics } from '@/lib/analytics/types'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
