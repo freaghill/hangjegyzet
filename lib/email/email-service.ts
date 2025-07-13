@@ -293,3 +293,19 @@ export class EmailService {
     return this.sendGridService.processWebhook(body, signature)
   }
 }
+
+// Create a singleton instance
+let emailServiceInstance: EmailService | null = null
+
+export function getEmailService(): EmailService {
+  if (!emailServiceInstance) {
+    emailServiceInstance = new EmailService()
+  }
+  return emailServiceInstance
+}
+
+// Export sendEmail function for compatibility
+export async function sendEmail(data: EmailData): Promise<EmailDeliveryStatus> {
+  const service = getEmailService()
+  return service.send(data)
+}

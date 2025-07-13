@@ -39,3 +39,6 @@ export async function deleteFile(bucketName: string, path: string) {
     .remove([path])
   if (error) throw error
 }
+
+// Export createAdminClient for compatibility
+export const createAdminClient = () => supabaseAdmin

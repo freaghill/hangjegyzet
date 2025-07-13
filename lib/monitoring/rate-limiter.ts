@@ -311,3 +311,34 @@ export class RateLimiter {
     return status
   }
 }
+
+// Create a singleton instance
+let rateLimiterInstance: RateLimiter | null = null
+
+export async function getRateLimiter(): Promise<RateLimiter> {
+  if (!rateLimiterInstance) {
+    const supabase = await createClient()
+    rateLimiterInstance = new RateLimiter(supabase)
+  }
+  return rateLimiterInstance
+}
+
+// Export as default named export for compatibility
+export const rateLimiter = {
+  checkLimit: async (...args: Parameters<RateLimiter['checkLimit']>) => {
+    const instance = await getRateLimiter()
+    return instance.checkLimit(...args)
+  },
+  checkBurstLimit: async (...args: Parameters<RateLimiter['checkBurstLimit']>) => {
+    const instance = await getRateLimiter()
+    return instance.checkBurstLimit(...args)
+  },
+  resetLimits: async (...args: Parameters<RateLimiter['resetLimits']>) => {
+    const instance = await getRateLimiter()
+    return instance.resetLimits(...args)
+  },
+  getStatus: async (...args: Parameters<RateLimiter['getStatus']>) => {
+    const instance = await getRateLimiter()
+    return instance.getStatus(...args)
+  }
+}

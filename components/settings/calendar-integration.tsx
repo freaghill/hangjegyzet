@@ -24,7 +24,7 @@ interface CalendarIntegration {
   created_at: string
 }
 
-export default function CalendarIntegration() {
+export function CalendarIntegration() {
   const [integration, setIntegration] = useState<CalendarIntegration | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isConnecting, setIsConnecting] = useState(false)

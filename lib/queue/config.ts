@@ -2,13 +2,16 @@ import Redis from 'ioredis'
 import { Queue, Worker, QueueEvents } from 'bullmq'
 
 // Redis connection for BullMQ
-const connection = new Redis({
+export const redisConnection = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD,
   maxRetriesPerRequest: null,
   enableOfflineQueue: false,
 })
+
+// Keep internal reference for backward compatibility
+const connection = redisConnection
 
 // Queue definitions
 export const QUEUE_NAMES = {

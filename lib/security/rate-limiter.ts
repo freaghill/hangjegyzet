@@ -149,3 +149,6 @@ export function withRateLimit(
     return response
   }
 }
+
+// Export getClientId as alias for getRateLimitKey for compatibility
+export const getClientId = getRateLimitKey

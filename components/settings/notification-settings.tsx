@@ -43,7 +43,7 @@ const EVENT_TYPES = [
   { value: 'highlight_created', label: 'Kiemelés hozzáadva', description: 'Értesítés új kiemelések létrehozásakor' },
 ]
 
-export default function NotificationSettings() {
+export function NotificationSettings() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([])
   const [preferences, setPreferences] = useState<NotificationPreference[]>([])
   const [loading, setLoading] = useState(true)

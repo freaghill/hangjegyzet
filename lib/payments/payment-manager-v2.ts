@@ -150,3 +150,6 @@ export function getPaymentManager(): PaymentManager {
   }
   return paymentManagerInstance
 }
+
+// Export as PaymentManagerV2 for compatibility
+export { PaymentManager as PaymentManagerV2 }

@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { securityMiddleware, applySecurityHeaders } from './middleware/security'
+import { securityMiddleware, applySecurityHeaders } from './middleware/security-edge'
 import { generateNonce } from '@/lib/security/headers'
 
 export async function middleware(request: NextRequest) {

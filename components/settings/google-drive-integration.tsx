@@ -58,7 +58,7 @@ interface SyncLog {
   completed_at?: string
 }
 
-export default function GoogleDriveIntegration() {
+export function GoogleDriveIntegration() {
   const [integration, setIntegration] = useState<GoogleDriveIntegration | null>(null)
   const [syncLogs, setSyncLogs] = useState<SyncLog[]>([])
   const [loading, setLoading] = useState(true)

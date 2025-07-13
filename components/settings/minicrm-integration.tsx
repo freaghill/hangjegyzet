@@ -24,7 +24,7 @@ interface MiniCRMIntegration {
   activity_type_id: number | null
 }
 
-export default function MiniCRMIntegration() {
+export function MiniCRMIntegration() {
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
   const [disconnecting, setDisconnecting] = useState(false)

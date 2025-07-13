@@ -37,7 +37,7 @@ interface ZoomRecording {
   }
 }
 
-export default function ZoomIntegration() {
+export function ZoomIntegration() {
   const [integration, setIntegration] = useState<ZoomIntegration | null>(null)
   const [recordings, setRecordings] = useState<ZoomRecording[]>([])
   const [loading, setLoading] = useState(true)

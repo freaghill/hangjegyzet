@@ -71,7 +71,12 @@ export function getCSP(nonce: string): string {
 
 // Generate nonce for CSP
 export function generateNonce(): string {
-  return Buffer.from(crypto.randomUUID()).toString('base64')
+  // Edge-compatible nonce generation
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return btoa(crypto.randomUUID())
+  }
+  // Fallback for Edge Runtime
+  return btoa(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15))
 }
 
 // Security headers configuration

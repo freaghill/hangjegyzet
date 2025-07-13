@@ -78,3 +78,6 @@ export const redisHelpers = {
     }
   }
 }
+
+// Export as upstashRedis for compatibility
+export const upstashRedis = redis

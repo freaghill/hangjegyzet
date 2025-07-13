@@ -29,7 +29,7 @@ const categoryLabels: Record<VocabularyCategory, string> = {
   custom: 'Egyéni'
 }
 
-export default function VocabularyManager() {
+export function VocabularyManager() {
   const [terms, setTerms] = useState<VocabularyTerm[]>([])
   const [learningHistory, setLearningHistory] = useState<VocabularyLearning[]>([])
   const [selectedCategory, setSelectedCategory] = useState<VocabularyCategory | 'all'>('all')
