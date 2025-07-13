@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import { useToast } from '@/hooks/use-toast'
+import { useToast } from '@/components/ui/use-toast'
 import Uppy from '@uppy/core'
 import { Dashboard } from '@uppy/react'
 import GoogleDrive from '@uppy/google-drive'
@@ -110,15 +110,15 @@ export default function GoogleDriveIntegration() {
     // Set up Uppy event handlers
     uppy.on('upload-success', (file, response) => {
       toast({
-        title: 'Sikeres feltöltés',
-        description: `${file.name} sikeresen feltöltve és feldolgozás alatt.`,
+        title: 'Sikeres feltï¿½ltï¿½s',
+        description: `${file.name} sikeresen feltï¿½ltve ï¿½s feldolgozï¿½s alatt.`,
       })
       loadIntegration() // Refresh to show new files
     })
 
     uppy.on('upload-error', (file, error) => {
       toast({
-        title: 'Feltöltési hiba',
+        title: 'Feltï¿½ltï¿½si hiba',
         description: `${file?.name}: ${error.message}`,
         variant: 'destructive',
       })
@@ -162,7 +162,7 @@ export default function GoogleDriveIntegration() {
     } catch (error) {
       toast({
         title: 'Hiba',
-        description: 'Nem sikerült elindítani a hitelesítést',
+        description: 'Nem sikerï¿½lt elindï¿½tani a hitelesï¿½tï¿½st',
         variant: 'destructive',
       })
     } finally {
@@ -183,8 +183,8 @@ export default function GoogleDriveIntegration() {
       
       if (response.ok) {
         toast({
-          title: 'Szinkronizálás sikeres',
-          description: `${data.filesFound} fájl találva, ${data.filesImported} új fájl importálva`,
+          title: 'Szinkronizï¿½lï¿½s sikeres',
+          description: `${data.filesFound} fï¿½jl talï¿½lva, ${data.filesImported} ï¿½j fï¿½jl importï¿½lva`,
         })
         loadIntegration()
       } else {
@@ -192,7 +192,7 @@ export default function GoogleDriveIntegration() {
       }
     } catch (error) {
       toast({
-        title: 'Szinkronizálási hiba',
+        title: 'Szinkronizï¿½lï¿½si hiba',
         description: error instanceof Error ? error.message : 'Ismeretlen hiba',
         variant: 'destructive',
       })
@@ -212,13 +212,13 @@ export default function GoogleDriveIntegration() {
       if (response.ok) {
         setIntegration(prev => prev ? { ...prev, auto_sync_enabled: enabled } : null)
         toast({
-          title: enabled ? 'Automatikus szinkronizálás bekapcsolva' : 'Automatikus szinkronizálás kikapcsolva',
+          title: enabled ? 'Automatikus szinkronizï¿½lï¿½s bekapcsolva' : 'Automatikus szinkronizï¿½lï¿½s kikapcsolva',
         })
       }
     } catch (error) {
       toast({
         title: 'Hiba',
-        description: 'Nem sikerült módosítani a beállítást',
+        description: 'Nem sikerï¿½lt mï¿½dosï¿½tani a beï¿½llï¿½tï¿½st',
         variant: 'destructive',
       })
     }
@@ -235,13 +235,13 @@ export default function GoogleDriveIntegration() {
       if (response.ok) {
         loadIntegration()
         toast({
-          title: 'Mappa eltávolítva',
+          title: 'Mappa eltï¿½volï¿½tva',
         })
       }
     } catch (error) {
       toast({
         title: 'Hiba',
-        description: 'Nem sikerült eltávolítani a mappát',
+        description: 'Nem sikerï¿½lt eltï¿½volï¿½tani a mappï¿½t',
         variant: 'destructive',
       })
     }
@@ -263,10 +263,10 @@ export default function GoogleDriveIntegration() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <img src="/google-drive-icon.svg" alt="Google Drive" className="h-6 w-6" />
-            Google Drive Integráció
+            Google Drive Integrï¿½ciï¿½
           </CardTitle>
           <CardDescription>
-            Automatikusan importálja és átírja a Google Drive mappáiban található hang- és videófájlokat
+            Automatikusan importï¿½lja ï¿½s ï¿½tï¿½rja a Google Drive mappï¿½iban talï¿½lhatï¿½ hang- ï¿½s videï¿½fï¿½jlokat
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -274,16 +274,16 @@ export default function GoogleDriveIntegration() {
             <div className="text-center py-8">
               <FolderOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <p className="text-muted-foreground mb-4">
-                Kapcsolja össze Google Drive fiókját a gyors fájl importáláshoz
+                Kapcsolja ï¿½ssze Google Drive fiï¿½kjï¿½t a gyors fï¿½jl importï¿½lï¿½shoz
               </p>
               <Button onClick={handleAuth} disabled={authenticating}>
                 {authenticating ? (
                   <>
                     <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Kapcsolódás...
+                    Kapcsolï¿½dï¿½s...
                   </>
                 ) : (
-                  'Google Drive kapcsolása'
+                  'Google Drive kapcsolï¿½sa'
                 )}
               </Button>
             </div>
@@ -293,7 +293,7 @@ export default function GoogleDriveIntegration() {
               <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                 <div className="flex items-center gap-2">
                   <Check className="h-5 w-5 text-green-600" />
-                  <span className="font-medium">Google Drive kapcsolódva</span>
+                  <span className="font-medium">Google Drive kapcsolï¿½dva</span>
                 </div>
                 <Button
                   variant="outline"
@@ -301,7 +301,7 @@ export default function GoogleDriveIntegration() {
                   onClick={() => setShowUploader(!showUploader)}
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  Fájlok feltöltése
+                  Fï¿½jlok feltï¿½ltï¿½se
                 </Button>
               </div>
 
@@ -313,7 +313,7 @@ export default function GoogleDriveIntegration() {
                     proudlyDisplayPoweredByUppy={false}
                     height={450}
                     showProgressDetails
-                    note="Válasszon audio vagy video fájlokat a Google Drive-ból"
+                    note="Vï¿½lasszon audio vagy video fï¿½jlokat a Google Drive-bï¿½l"
                   />
                 </div>
               )}
@@ -321,9 +321,9 @@ export default function GoogleDriveIntegration() {
               {/* Auto-sync Settings */}
               <div className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="space-y-0.5">
-                  <Label className="text-base">Automatikus szinkronizálás</Label>
+                  <Label className="text-base">Automatikus szinkronizï¿½lï¿½s</Label>
                   <p className="text-sm text-muted-foreground">
-                    Új fájlok automatikus importálása a figyelt mappákból
+                    ï¿½j fï¿½jlok automatikus importï¿½lï¿½sa a figyelt mappï¿½kbï¿½l
                   </p>
                 </div>
                 <Switch
@@ -335,7 +335,7 @@ export default function GoogleDriveIntegration() {
               {/* Watched Folders */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium">Figyelt mappák</h4>
+                  <h4 className="font-medium">Figyelt mappï¿½k</h4>
                   <Button
                     variant="outline"
                     size="sm"
@@ -346,13 +346,13 @@ export default function GoogleDriveIntegration() {
                         '_blank'
                       )
                       toast({
-                        title: 'Mappa hozzáadása',
-                        description: 'Válassza ki a mappát a Google Drive-ban, majd használja a megosztási linket',
+                        title: 'Mappa hozzï¿½adï¿½sa',
+                        description: 'Vï¿½lassza ki a mappï¿½t a Google Drive-ban, majd hasznï¿½lja a megosztï¿½si linket',
                       })
                     }}
                   >
                     <Plus className="mr-2 h-4 w-4" />
-                    Mappa hozzáadása
+                    Mappa hozzï¿½adï¿½sa
                   </Button>
                 </div>
 
@@ -360,7 +360,7 @@ export default function GoogleDriveIntegration() {
                   <Alert>
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>
-                      Még nem adott hozzá figyelt mappákat. Adjon hozzá mappákat az automatikus importáláshoz.
+                      Mï¿½g nem adott hozzï¿½ figyelt mappï¿½kat. Adjon hozzï¿½ mappï¿½kat az automatikus importï¿½lï¿½shoz.
                     </AlertDescription>
                   </Alert>
                 ) : (
@@ -376,7 +376,7 @@ export default function GoogleDriveIntegration() {
                             <p className="font-medium">{folder.name}</p>
                             {folder.lastSyncedAt && (
                               <p className="text-sm text-muted-foreground">
-                                Utolsó szinkronizálás:{' '}
+                                Utolsï¿½ szinkronizï¿½lï¿½s:{' '}
                                 {formatDistanceToNow(new Date(folder.lastSyncedAt), {
                                   addSuffix: true,
                                   locale: hu,
@@ -418,12 +418,12 @@ export default function GoogleDriveIntegration() {
                   {syncing ? (
                     <>
                       <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Szinkronizálás...
+                      Szinkronizï¿½lï¿½s...
                     </>
                   ) : (
                     <>
                       <RefreshCw className="mr-2 h-4 w-4" />
-                      Összes mappa szinkronizálása
+                      ï¿½sszes mappa szinkronizï¿½lï¿½sa
                     </>
                   )}
                 </Button>
@@ -437,7 +437,7 @@ export default function GoogleDriveIntegration() {
       {syncLogs.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Szinkronizálási elQzmények</CardTitle>
+            <CardTitle>Szinkronizï¿½lï¿½si elQzmï¿½nyek</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -464,9 +464,9 @@ export default function GoogleDriveIntegration() {
                     ) : (
                       <>
                         <p className="font-medium">
-                          {log.files_imported}/{log.files_found} fájl
+                          {log.files_imported}/{log.files_found} fï¿½jl
                         </p>
-                        <p className="text-muted-foreground">importálva</p>
+                        <p className="text-muted-foreground">importï¿½lva</p>
                       </>
                     )}
                   </div>
