@@ -22,7 +22,7 @@ interface Alert {
 export async function GET(req: NextRequest) {
   try {
     const cookieStore = cookies()
-    const supabase = createClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(req.url)
     const status = searchParams.get('status') || 'active' // active, acknowledged, resolved, all
     const severity = searchParams.get('severity') // critical, high, medium, low
@@ -159,7 +159,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const cookieStore = cookies()
-    const supabase = createClient()
+    const supabase = await createClient()
     const body = await req.json()
     const { alertId, action } = body // action: acknowledge, resolve
 
