@@ -3,7 +3,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ProfileSettings from '@/components/settings/profile-settings'
 import OrganizationSettings from '@/components/settings/organization-settings'
-import NotificationSettings from '@/components/settings/notification-settings'
+import { NotificationSettings } from '@/components/settings/notification-settings'
 import VocabularySettings from '@/components/settings/vocabulary-settings'
 import IntegrationSettings from '@/components/settings/integration-settings'
 import BillingSettings from '@/components/settings/billing-settings'

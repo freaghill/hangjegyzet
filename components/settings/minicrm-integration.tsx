@@ -329,3 +329,5 @@ export function MiniCRMIntegration() {
     </Card>
   )
 }
+
+export default MiniCRMIntegration

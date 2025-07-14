@@ -2,10 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import GoogleDriveIntegration from './google-drive-integration'
-import CalendarIntegration from './calendar-integration'
-import ZoomIntegration from './zoom-integration'
-import MiniCRMIntegration from './minicrm-integration'
+import { GoogleDriveIntegration } from './google-drive-integration'
+import { CalendarIntegration } from './calendar-integration'
+import { ZoomIntegration } from './zoom-integration'
+import { MiniCRMIntegration } from './minicrm-integration'
 
 export default function IntegrationSettings() {
   return (

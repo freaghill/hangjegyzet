@@ -479,3 +479,5 @@ export function GoogleDriveIntegration() {
     </div>
   )
 }
+
+export default GoogleDriveIntegration

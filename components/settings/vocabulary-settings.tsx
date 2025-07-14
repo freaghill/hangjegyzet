@@ -1,6 +1,6 @@
 'use client'
 
-import VocabularyManager from './vocabulary-manager'
+import { VocabularyManager } from './vocabulary-manager'
 
 interface VocabularySettingsProps {
   organizationId: string

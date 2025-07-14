@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 const ZOOM_CLIENT_ID = process.env.ZOOM_CLIENT_ID!
 const ZOOM_CLIENT_SECRET = process.env.ZOOM_CLIENT_SECRET!

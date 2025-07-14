@@ -813,3 +813,5 @@ export function VocabularyManager() {
     </div>
   )
 }
+
+export default VocabularyManager

@@ -42,3 +42,6 @@ export async function deleteFile(bucketName: string, path: string) {
 
 // Export createAdminClient for compatibility
 export const createAdminClient = () => supabaseAdmin
+
+// Export createClient alias for backward compatibility
+export const createClient = () => supabaseAdmin

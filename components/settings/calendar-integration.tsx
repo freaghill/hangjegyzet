@@ -308,3 +308,5 @@ export function CalendarIntegration() {
     </Card>
   )
 }
+
+export default CalendarIntegration

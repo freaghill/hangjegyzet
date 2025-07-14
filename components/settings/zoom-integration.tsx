@@ -348,3 +348,5 @@ export function ZoomIntegration() {
     </div>
   )
 }
+
+export default ZoomIntegration

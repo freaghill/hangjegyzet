@@ -4,7 +4,7 @@ import { z } from 'zod'
 import crypto from 'crypto'
 
 // Webhook event types that Zapier can subscribe to
-export const WEBHOOK_EVENTS = {
+const WEBHOOK_EVENTS = {
   'meeting.created': 'When a new meeting is created',
   'meeting.completed': 'When a meeting transcription is completed',
   'meeting.failed': 'When a meeting transcription fails',
