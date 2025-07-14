@@ -174,11 +174,21 @@ export class MiniCRMIntegration {
     accessToken: string,
     query: string
   ): Promise<MiniCRMContact[]> {
+    // Sanitize query to prevent injection
+    const sanitizedQuery = query
+      .replace(/[%_\\]/g, '\\$&')  // Escape SQL wildcards and backslash
+      .replace(/['"]/g, '')         // Remove quotes
+      .trim()
+    
+    if (!sanitizedQuery) {
+      return []
+    }
+    
     const filters = {
       $or: [
-        { Name: { $like: `%${query}%` } },
-        { Email: { $like: `%${query}%` } },
-        { Phone: { $like: `%${query}%` } },
+        { Name: { $like: `%${sanitizedQuery}%` } },
+        { Email: { $like: `%${sanitizedQuery}%` } },
+        { Phone: { $like: `%${sanitizedQuery}%` } },
       ]
     }
 
@@ -203,10 +213,20 @@ export class MiniCRMIntegration {
     accessToken: string,
     query: string
   ): Promise<MiniCRMCompany[]> {
+    // Sanitize query to prevent injection
+    const sanitizedQuery = query
+      .replace(/[%_\\]/g, '\\$&')  // Escape SQL wildcards and backslash
+      .replace(/['"]/g, '')         // Remove quotes
+      .trim()
+    
+    if (!sanitizedQuery) {
+      return []
+    }
+    
     const filters = {
       $or: [
-        { Name: { $like: `%${query}%` } },
-        { TaxNumber: { $like: `%${query}%` } },
+        { Name: { $like: `%${sanitizedQuery}%` } },
+        { TaxNumber: { $like: `%${sanitizedQuery}%` } },
       ]
     }
 
@@ -231,8 +251,18 @@ export class MiniCRMIntegration {
     accessToken: string,
     query: string
   ): Promise<MiniCRMProject[]> {
+    // Sanitize query to prevent injection
+    const sanitizedQuery = query
+      .replace(/[%_\\]/g, '\\$&')  // Escape SQL wildcards and backslash
+      .replace(/['"]/g, '')         // Remove quotes
+      .trim()
+    
+    if (!sanitizedQuery) {
+      return []
+    }
+    
     const filters = {
-      Name: { $like: `%${query}%` }
+      Name: { $like: `%${sanitizedQuery}%` }
     }
 
     return this.makeRequest(
