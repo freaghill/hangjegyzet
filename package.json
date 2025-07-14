@@ -65,7 +65,7 @@
     "@anthropic-ai/sdk": "^0.20.6",
     "@azure/identity": "^4.10.2",
     "@azure/msal-node": "^3.6.2",
-    "@deepgram/sdk": "^4.8.0",
+    "@deepgram/sdk": "^4.9.1",
     "@hookform/resolvers": "^3.3.4",
     "@langchain/anthropic": "^0.3.24",
     "@langchain/core": "^0.3.62",
