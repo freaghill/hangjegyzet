@@ -55,6 +55,7 @@ async function sendUsageLimitWebhooks() {
  * Vercel Cron configuration
  * Add this to vercel.json:
  * 
+ * ```json
  * {
  *   "crons": [
  *     {
@@ -63,6 +64,7 @@ async function sendUsageLimitWebhooks() {
  *     }
  *   ]
  * }
+ * ```
  */
 
 // API Route handler for Vercel Cron
