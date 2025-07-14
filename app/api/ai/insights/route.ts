@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
       user_id: user.id,
       organization_id: meeting.organization_id,
       meeting_type: meeting.meeting_type,
-      processing_time: Date.now() - startTime
+      processing_time: String(Date.now() - startTime)
     })
     
     // Cache the results for 1 hour
