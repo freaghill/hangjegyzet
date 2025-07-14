@@ -268,7 +268,7 @@ ${logs?.map(log => `- ${log.action} at ${format(new Date(log.created_at), 'yyyy-
                         <Badge variant="secondary" className="text-xs">Admin</Badge>
                       )}
                       {comment.is_internal && (
-                        <Badge variant="warning" className="text-xs">Internal</Badge>
+                        <Badge variant="outline" className="text-xs">Internal</Badge>
                       )}
                     </div>
                     <p className="text-xs text-gray-500">
