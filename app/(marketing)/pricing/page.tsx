@@ -497,7 +497,10 @@ function PricingCards({ plans, yearly }: { plans: string[], yearly: boolean }) {
               )}
               
               <CardDescription className="mt-2">
-                {plan.description}
+                {planId === 'starter' && 'Kisvállalkozásoknak és kezdőknek'}
+                {planId === 'professional' && 'Növekvő csapatok számára'}
+                {planId === 'enterprise' && 'Nagyvállalatok számára'}
+                {planId === 'trial' && 'Próbálja ki ingyen'}
               </CardDescription>
             </CardHeader>
             
