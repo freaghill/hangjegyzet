@@ -114,7 +114,7 @@ export const POST = withLogging(async (req: NextRequest) => {
 export const GET = withLogging(async (req: NextRequest) => {
   const requestLogger = (req as any).log as typeof log
   const { searchParams } = new URL(req.url)
-  const userId = searchParams.get('userId')
+  const userId = searchParams.get('userId') || undefined
   
   requestLogger.info('Fetching user data', { userId })
   
