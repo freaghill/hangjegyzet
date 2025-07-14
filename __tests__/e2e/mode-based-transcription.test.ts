@@ -104,7 +104,7 @@ test.describe('Mode-Based Transcription E2E Tests', () => {
       
       // Check updated usage
       const newUsage = await getOrganizationUsage(TEST_USER.organizationId)
-      expect(newUsage.fast).toBe(initialUsage.fast + 2) // 2 minute file
+      expect((newUsage as any).fast).toBe((initialUsage as any).fast + 2) // 2 minute file
     })
 
     test('should enforce mode limits', async ({ page }) => {

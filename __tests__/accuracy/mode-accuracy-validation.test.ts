@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from '@jest/globals'
 import { calculateWER, calculateCER } from '@/lib/transcription/accuracy-metrics'
-import { processTranscriptionJob } from '@/lib/jobs/transcription-processor'
+import { processTranscriptionJobJob } from '@/lib/jobs/transcription-processor'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -183,7 +183,7 @@ describe('Mode Accuracy Validation', () => {
       it(`should achieve ${testCase.expectedAccuracy[mode].min}-${testCase.expectedAccuracy[mode].max}% accuracy`, async () => {
         // Process audio with specified mode
         const audioPath = path.join(testDataPath, testCase.audioFile)
-        const result = await processTranscription({
+        const result = await processTranscriptionJob({
           audioPath,
           mode,
           language: testCase.language,
@@ -225,13 +225,13 @@ describe('Mode Accuracy Validation', () => {
           
           // Process with both modes
           const [currentResult, lowerResult] = await Promise.all([
-            processTranscription({
+            processTranscriptionJob({
               audioPath: path.join(testDataPath, testCase.audioFile),
               mode,
               language: testCase.language,
               options: getModeOptions(mode)
             }),
-            processTranscription({
+            processTranscriptionJob({
               audioPath: path.join(testDataPath, testCase.audioFile),
               mode: lowerMode,
               language: testCase.language,
@@ -264,7 +264,7 @@ describe('Mode Accuracy Validation', () => {
     it('Fast mode should complete quickly', async () => {
       const startTime = Date.now()
       
-      await processTranscription({
+      await processTranscriptionJob({
         audioPath: path.join(testDataPath, TEST_CASES[0].audioFile),
         mode: 'fast',
         language: 'hu',
@@ -276,7 +276,7 @@ describe('Mode Accuracy Validation', () => {
     })
     
     it('Balanced mode should include vocabulary enhancement', async () => {
-      const result = await processTranscription({
+      const result = await processTranscriptionJob({
         audioPath: path.join(testDataPath, TEST_CASES[0].audioFile),
         mode: 'balanced',
         language: 'hu',
@@ -289,7 +289,7 @@ describe('Mode Accuracy Validation', () => {
     })
     
     it('Precision mode should include AI post-processing', async () => {
-      const result = await processTranscription({
+      const result = await processTranscriptionJob({
         audioPath: path.join(testDataPath, TEST_CASES[0].audioFile),
         mode: 'precision',
         language: 'hu',
@@ -305,7 +305,7 @@ describe('Mode Accuracy Validation', () => {
   
   describe('Edge cases', () => {
     it('should handle very short audio files', async () => {
-      const result = await processTranscription({
+      const result = await processTranscriptionJob({
         audioPath: path.join(testDataPath, 'short-10s.mp3'),
         mode: 'balanced',
         language: 'hu',
@@ -317,7 +317,7 @@ describe('Mode Accuracy Validation', () => {
     })
     
     it('should handle audio with long silences', async () => {
-      const result = await processTranscription({
+      const result = await processTranscriptionJob({
         audioPath: path.join(testDataPath, 'audio-with-silences.mp3'),
         mode: 'balanced',
         language: 'hu',
@@ -331,7 +331,7 @@ describe('Mode Accuracy Validation', () => {
     })
     
     it('should handle multiple speakers correctly', async () => {
-      const result = await processTranscription({
+      const result = await processTranscriptionJob({
         audioPath: path.join(testDataPath, 'multiple-speakers.mp3'),
         mode: 'precision',
         language: 'hu',
