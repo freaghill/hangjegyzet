@@ -173,7 +173,7 @@ export async function POST(
     }
     
     // Send notification for highlights created
-    const organizationId = meeting.profiles?.organization_id || meeting.organization_id
+    const organizationId = (meeting.profiles as any)?.organization_id || meeting.organization_id
     if (organizationId && highlights.length > 0) {
       try {
         await notificationManager.sendNotification({
