@@ -39,6 +39,8 @@
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test:smoke": "node scripts/smoke-tests.js",
+    "db:backup": "node scripts/db-backup.js",
     "deploy:staging": "./scripts/deploy-staging.sh",
     "deploy:production": "./scripts/deploy-production.sh",
     "backup:staging": "pg_dump $DATABASE_URL > backups/staging-$(date +%Y%m%d-%H%M%S).sql",

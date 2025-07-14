@@ -1,119 +1,143 @@
 #!/usr/bin/env node
 
 /**
- * Smoke tests for production deployment
- * Run critical path tests to ensure the deployment is working
+ * Smoke tests for production/staging deployments
+ * Usage: node scripts/smoke-tests.js [production|staging]
  */
 
 const https = require('https');
-const { URL } = require('url');
+const http = require('http');
 
-const environment = process.argv[2] || 'production';
-const baseUrls = {
-  production: 'https://hangjegyzet.hu',
-  staging: 'https://staging.hangjegyzet.hu',
-  local: 'http://localhost:3000'
+const environment = process.argv[2] || 'staging';
+
+const config = {
+  production: {
+    baseUrl: 'https://hangjegyzet.hu',
+    healthEndpoint: '/api/health',
+    expectedVersion: process.env.EXPECTED_VERSION || '1.0.0'
+  },
+  staging: {
+    baseUrl: 'https://staging.hangjegyzet.hu',
+    healthEndpoint: '/api/health',
+    expectedVersion: process.env.EXPECTED_VERSION || '1.0.0'
+  }
 };
 
-const baseUrl = process.env.SMOKE_TEST_URL || baseUrls[environment];
+const currentConfig = config[environment];
 
-console.log(`Running smoke tests against: ${baseUrl}`);
+if (!currentConfig) {
+  console.error(`Invalid environment: ${environment}. Use 'production' or 'staging'`);
+  process.exit(1);
+}
 
-// Test endpoints
-const endpoints = [
-  { path: '/', expectedStatus: 200, description: 'Homepage' },
-  { path: '/api/health', expectedStatus: 200, description: 'Health check' },
-  { path: '/login', expectedStatus: 200, description: 'Login page' },
-  { path: '/register', expectedStatus: 200, description: 'Registration page' },
-  { path: '/pricing', expectedStatus: 200, description: 'Pricing page' },
-  { path: '/api/auth/providers', expectedStatus: 200, description: 'Auth providers' },
-];
-
-// Test utilities
-function makeRequest(url) {
+// Test functions
+async function checkEndpoint(path, expectedStatus = 200) {
   return new Promise((resolve, reject) => {
-    const parsedUrl = new URL(url);
-    const module = parsedUrl.protocol === 'https:' ? https : require('http');
+    const url = new URL(path, currentConfig.baseUrl);
+    const protocol = url.protocol === 'https:' ? https : http;
     
-    const req = module.get(url, { timeout: 10000 }, (res) => {
-      let data = '';
-      res.on('data', chunk => data += chunk);
-      res.on('end', () => resolve({ status: res.statusCode, data }));
+    console.log(`Testing ${url.href}...`);
+    
+    const req = protocol.get(url.href, (res) => {
+      if (res.statusCode === expectedStatus) {
+        console.log(`✅ ${path} - Status: ${res.statusCode}`);
+        resolve(true);
+      } else {
+        console.error(`❌ ${path} - Expected: ${expectedStatus}, Got: ${res.statusCode}`);
+        reject(new Error(`Unexpected status code: ${res.statusCode}`));
+      }
     });
     
-    req.on('error', reject);
-    req.on('timeout', () => {
+    req.on('error', (error) => {
+      console.error(`❌ ${path} - Error: ${error.message}`);
+      reject(error);
+    });
+    
+    req.setTimeout(10000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
   });
 }
 
-async function runTests() {
-  const results = [];
+async function checkHealthEndpoint() {
+  return new Promise((resolve, reject) => {
+    const url = new URL(currentConfig.healthEndpoint, currentConfig.baseUrl);
+    const protocol = url.protocol === 'https:' ? https : http;
+    
+    console.log(`Testing health endpoint ${url.href}...`);
+    
+    const req = protocol.get(url.href, (res) => {
+      let data = '';
+      
+      res.on('data', (chunk) => {
+        data += chunk;
+      });
+      
+      res.on('end', () => {
+        try {
+          const health = JSON.parse(data);
+          
+          if (health.status === 'healthy') {
+            console.log('✅ Health check passed');
+            console.log(`   Version: ${health.version}`);
+            console.log(`   Database: ${health.checks.database.status}`);
+            console.log(`   Supabase: ${health.checks.supabase.status}`);
+            resolve(true);
+          } else {
+            console.error(`❌ Health check failed - Status: ${health.status}`);
+            reject(new Error(`Unhealthy status: ${health.status}`));
+          }
+        } catch (error) {
+          console.error('❌ Failed to parse health response');
+          reject(error);
+        }
+      });
+    });
+    
+    req.on('error', (error) => {
+      console.error(`❌ Health check error: ${error.message}`);
+      reject(error);
+    });
+  });
+}
+
+async function runSmokeTests() {
+  console.log(`🔥 Running smoke tests for ${environment} environment`);
+  console.log(`Base URL: ${currentConfig.baseUrl}\n`);
+  
+  const tests = [
+    // Basic endpoints
+    () => checkEndpoint('/', 200),
+    () => checkEndpoint('/login', 200),
+    () => checkEndpoint('/api/health/live', 200),
+    () => checkHealthEndpoint(),
+    
+    // API endpoints (should return 401 without auth)
+    () => checkEndpoint('/api/meetings', 401),
+    () => checkEndpoint('/api/teams', 401),
+    () => checkEndpoint('/api/user', 401),
+    
+    // Static assets
+    () => checkEndpoint('/favicon.ico', 200),
+    
+    // Non-existent page (should return 404)
+    () => checkEndpoint('/this-page-does-not-exist', 404),
+  ];
+  
   let passed = 0;
   let failed = 0;
-
-  for (const endpoint of endpoints) {
-    const url = `${baseUrl}${endpoint.path}`;
-    const startTime = Date.now();
-    
+  
+  for (const test of tests) {
     try {
-      const response = await makeRequest(url);
-      const duration = Date.now() - startTime;
-      
-      if (response.status === endpoint.expectedStatus) {
-        console.log(`✅ ${endpoint.description} - ${response.status} (${duration}ms)`);
-        passed++;
-        
-        // Additional checks for specific endpoints
-        if (endpoint.path === '/api/health') {
-          const health = JSON.parse(response.data);
-          if (health.status !== 'ok') {
-            throw new Error(`Health check returned status: ${health.status}`);
-          }
-        }
-      } else {
-        console.error(`❌ ${endpoint.description} - Expected ${endpoint.expectedStatus}, got ${response.status}`);
-        failed++;
-      }
-      
-      results.push({
-        endpoint: endpoint.path,
-        description: endpoint.description,
-        success: response.status === endpoint.expectedStatus,
-        status: response.status,
-        duration
-      });
+      await test();
+      passed++;
     } catch (error) {
-      console.error(`❌ ${endpoint.description} - ${error.message}`);
       failed++;
-      results.push({
-        endpoint: endpoint.path,
-        description: endpoint.description,
-        success: false,
-        error: error.message
-      });
     }
   }
-
-  // Performance check
-  console.log('\n📊 Performance Summary:');
-  const avgDuration = results
-    .filter(r => r.duration)
-    .reduce((sum, r) => sum + r.duration, 0) / results.filter(r => r.duration).length;
   
-  console.log(`Average response time: ${Math.round(avgDuration)}ms`);
-  
-  if (avgDuration > 3000) {
-    console.warn('⚠️  Warning: Average response time is above 3 seconds');
-  }
-
-  // Summary
-  console.log('\n📋 Test Summary:');
-  console.log(`Total tests: ${endpoints.length}`);
-  console.log(`Passed: ${passed}`);
-  console.log(`Failed: ${failed}`);
+  console.log(`\n📊 Results: ${passed} passed, ${failed} failed`);
   
   if (failed > 0) {
     console.error('\n❌ Smoke tests failed!');
@@ -125,7 +149,7 @@ async function runTests() {
 }
 
 // Run tests
-runTests().catch(error => {
-  console.error('Smoke test runner failed:', error);
+runSmokeTests().catch((error) => {
+  console.error('Fatal error:', error);
   process.exit(1);
 });
