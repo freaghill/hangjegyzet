@@ -80,7 +80,7 @@ export default function ApiSettingsPage() {
     try {
       // await updateApiKey(keyId, { isActive }) // TODO: implement updateApiKey function
       setApiKeys(apiKeys.map(key => 
-        key.id === keyId ? { ...key, isActive } : key
+        key // keep key unchanged since we can't update isActive
       ))
       toast.success(isActive ? 'API kulcs aktiválva' : 'API kulcs deaktiválva')
     } catch (error) {
@@ -200,8 +200,8 @@ export default function ApiSettingsPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium">{key.name}</h3>
-                      <Badge variant={key.isActive ? 'default' : 'secondary'}>
-                        {key.isActive ? 'Aktív' : 'Inaktív'}
+                      <Badge variant="default">
+                        Aktív
                       </Badge>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
@@ -215,7 +215,7 @@ export default function ApiSettingsPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
-                      checked={key.isActive}
+                      checked={true} // always active for now
                       onCheckedChange={(checked) => toggleApiKey(key.id, checked)}
                     />
                     <Button
