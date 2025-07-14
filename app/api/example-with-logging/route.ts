@@ -23,7 +23,8 @@ export const POST = withLogging(async (req: NextRequest) => {
     const authHeader = req.headers.get('authorization')
     if (!authHeader) {
       requestLogger.warn('Missing authentication', { userId })
-      logAuth('api_access', userId, false, { reason: 'Missing auth header' })
+      // Log as general auth failure instead of specific api_access event
+      requestLogger.info('API access attempt without auth', { userId })
       
       return NextResponse.json(
         { error: 'Authentication required' },
