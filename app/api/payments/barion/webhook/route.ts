@@ -1,17 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getBarionService } from '@/lib/payments/barion'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@/lib/supabase/server'
 import { emailService } from '@/lib/email/sendgrid'
+import crypto from 'crypto'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Verify webhook signature
+function verifyWebhookSignature(body: string, signature: string | null): boolean {
+  if (!signature) return false
+  
+  const secret = process.env.BARION_WEBHOOK_SECRET!
+  if (!secret) {
+    console.error('BARION_WEBHOOK_SECRET not configured')
+    return false
+  }
+  
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(body)
+    .digest('hex')
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  )
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await request.json()
+    // Get raw body for signature verification
+    const body = await request.text()
+    const signature = request.headers.get('x-barion-signature') || 
+                     request.headers.get('barion-signature')
+    
+    // Verify webhook signature
+    if (!verifyWebhookSignature(body, signature)) {
+      console.error('Invalid webhook signature')
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+    }
+    
+    const payload = JSON.parse(body)
     console.log('Barion webhook received:', payload)
+    
+    // Create authenticated Supabase client
+    const supabase = await createClient()
 
     // Get payment status from Barion
     const barionService = getBarionService()
