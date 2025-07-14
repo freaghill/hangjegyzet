@@ -450,7 +450,7 @@ function PricingCards({ plans, yearly }: { plans: string[], yearly: boolean }) {
         const Icon = PLAN_ICONS[planId as keyof typeof PLAN_ICONS] || Sparkles
         const price = yearly ? calculateYearlyPrice(plan.price) : plan.price
         const isPopular = plan.popular
-        const isEnterprise = plan.enterprise
+        const isEnterprise = planId === 'enterprise'
         
         return (
           <Card 
