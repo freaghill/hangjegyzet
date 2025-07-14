@@ -34,7 +34,7 @@ interface TimeSeriesData {
 export async function GET(req: NextRequest) {
   try {
     const cookieStore = cookies()
-    const supabase = createClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(req.url)
     const days = parseInt(searchParams.get('days') || '30')
     const interval = searchParams.get('interval') || 'daily' // daily, weekly, monthly

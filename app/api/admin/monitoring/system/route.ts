@@ -35,7 +35,7 @@ interface SystemMetrics {
 export async function GET(req: NextRequest) {
   try {
     const cookieStore = cookies()
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Check if user is admin
     const { data: { user } } = await supabase.auth.getUser()

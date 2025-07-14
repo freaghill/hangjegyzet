@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 export async function GET(req: NextRequest) {
   try {
     const cookieStore = cookies()
-    const supabase = createClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(req.url)
     const type = searchParams.get('type') || 'usage' // usage, alerts, performance, organizations
     const format = searchParams.get('format') || 'csv' // csv, json

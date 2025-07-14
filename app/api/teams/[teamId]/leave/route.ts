@@ -8,7 +8,7 @@ export async function POST(
   { params }: { params: { teamId: string } }
 ) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
