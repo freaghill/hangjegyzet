@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { cookies } from 'next/headers'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 
 // CSRF token configuration
 const CSRF_TOKEN_LENGTH = 32
