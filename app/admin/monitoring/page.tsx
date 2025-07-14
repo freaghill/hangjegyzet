@@ -340,7 +340,9 @@ export default function MonitoringDashboard() {
                     <p className="text-sm font-medium text-gray-600">MRR</p>
                     <p className="text-2xl font-bold">${usageMetrics?.revenue.mrr.toLocaleString()}</p>
                     <p className="text-sm text-green-600">
-                      +{usageMetrics?.growth.revenueGrowth.toFixed(1)}%
+                      {usageMetrics?.growth?.revenueGrowth !== undefined 
+                        ? `+${usageMetrics.growth.revenueGrowth.toFixed(1)}%`
+                        : 'N/A'}
                     </p>
                   </div>
                   <DollarSign className="h-8 w-8 text-yellow-600" />
@@ -467,8 +469,10 @@ export default function MonitoringDashboard() {
               <CardContent className="p-6">
                 <p className="text-sm font-medium text-gray-600">MRR</p>
                 <p className="text-2xl font-bold">${usageMetrics?.revenue.mrr.toLocaleString()}</p>
-                <p className={`text-sm ${usageMetrics?.growth.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {usageMetrics?.growth.revenueGrowth >= 0 ? '+' : ''}{usageMetrics?.growth.revenueGrowth.toFixed(1)}% vs last month
+                <p className={`text-sm ${usageMetrics?.growth?.revenueGrowth && usageMetrics.growth.revenueGrowth >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {usageMetrics?.growth?.revenueGrowth !== undefined ? (
+                    `${usageMetrics.growth.revenueGrowth >= 0 ? '+' : ''}${usageMetrics.growth.revenueGrowth.toFixed(1)}% vs last month`
+                  ) : 'N/A'}
                 </p>
               </CardContent>
             </Card>
