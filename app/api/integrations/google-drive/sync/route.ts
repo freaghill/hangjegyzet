@@ -76,7 +76,11 @@ export async function POST(request: NextRequest) {
           const result = await syncAndProcessGoogleDriveFolder(
             integration,
             folder,
-            tokens
+            {
+              access_token: tokens.access_token || '',
+              refresh_token: tokens.refresh_token,
+              expiry_date: tokens.expiry_date
+            }
           )
 
           totalFilesFound += result.filesFound
