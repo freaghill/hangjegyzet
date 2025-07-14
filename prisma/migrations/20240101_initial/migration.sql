@@ -14,6 +14,41 @@ CREATE TABLE IF NOT EXISTS "User" (
 );
 
 -- CreateTable
+CREATE TABLE IF NOT EXISTS "Account" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "providerAccountId" TEXT NOT NULL,
+    "refresh_token" TEXT,
+    "access_token" TEXT,
+    "expires_at" INTEGER,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_state" TEXT,
+
+    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "Session" (
+    "id" TEXT NOT NULL,
+    "sessionToken" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "VerificationToken" (
+    "identifier" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE IF NOT EXISTS "Organization" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
@@ -53,6 +88,31 @@ CREATE TABLE IF NOT EXISTS "Team" (
 );
 
 -- CreateTable
+CREATE TABLE IF NOT EXISTS "TeamMember" (
+    "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'member',
+    "joinedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TeamMember_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "TeamInvitation" (
+    "id" TEXT NOT NULL,
+    "teamId" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "role" TEXT NOT NULL DEFAULT 'member',
+    "token" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "invitedById" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TeamInvitation_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE IF NOT EXISTS "Meeting" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
@@ -72,8 +132,203 @@ CREATE TABLE IF NOT EXISTS "Meeting" (
     CONSTRAINT "Meeting_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "MeetingShare" (
+    "id" TEXT NOT NULL,
+    "meetingId" TEXT NOT NULL,
+    "shareToken" TEXT NOT NULL,
+    "password" TEXT,
+    "expiresAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "MeetingShare_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable  
+CREATE TABLE IF NOT EXISTS "Speaker" (
+    "id" TEXT NOT NULL,
+    "meetingId" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT,
+    "color" TEXT,
+
+    CONSTRAINT "Speaker_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "Transcript" (
+    "id" TEXT NOT NULL,
+    "meetingId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "startTime" DOUBLE PRECISION NOT NULL,
+    "endTime" DOUBLE PRECISION NOT NULL,
+    "speakerId" TEXT,
+    "confidence" DOUBLE PRECISION,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Transcript_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "MeetingExport" (
+    "id" TEXT NOT NULL,
+    "meetingId" TEXT NOT NULL,
+    "format" TEXT NOT NULL,
+    "url" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "MeetingExport_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "UploadChunk" (
+    "id" TEXT NOT NULL,
+    "uploadId" TEXT NOT NULL,
+    "chunkIndex" INTEGER NOT NULL,
+    "data" BYTEA NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "UploadChunk_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "Payment" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'HUF',
+    "status" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "providerId" TEXT,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Payment_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "Subscription" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "plan" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "currentPeriodStart" TIMESTAMP(3) NOT NULL,
+    "currentPeriodEnd" TIMESTAMP(3) NOT NULL,
+    "cancelAtPeriodEnd" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Subscription_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "Invoice" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "organizationId" TEXT,
+    "invoiceNumber" TEXT NOT NULL,
+    "amount" DOUBLE PRECISION NOT NULL,
+    "currency" TEXT NOT NULL DEFAULT 'HUF',
+    "status" TEXT NOT NULL,
+    "dueDate" TIMESTAMP(3),
+    "paidAt" TIMESTAMP(3),
+    "billingoId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "UsageRecord" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "UsageRecord_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "EmailLog" (
+    "id" TEXT NOT NULL,
+    "to" TEXT NOT NULL,
+    "from" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "templateId" TEXT,
+    "status" TEXT NOT NULL,
+    "provider" TEXT NOT NULL DEFAULT 'sendgrid',
+    "providerId" TEXT,
+    "error" TEXT,
+    "metadata" JSONB,
+    "userId" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "EmailLog_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "EmailTemplate" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "subject" TEXT NOT NULL,
+    "htmlContent" TEXT NOT NULL,
+    "textContent" TEXT,
+    "variables" JSONB,
+    "organizationId" TEXT,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "EmailTemplate_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "SearchHistory" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "query" TEXT NOT NULL,
+    "filters" JSONB,
+    "resultCount" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "SearchHistory_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE IF NOT EXISTS "Alert" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "severity" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "metadata" JSONB,
+    "isRead" BOOLEAN NOT NULL DEFAULT false,
+    "readAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Alert_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "Session_sessionToken_key" ON "Session"("sessionToken");
+
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "VerificationToken_token_key" ON "VerificationToken"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "VerificationToken_identifier_token_key" ON "VerificationToken"("identifier", "token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "Organization_slug_key" ON "Organization"("slug");
@@ -84,20 +339,41 @@ CREATE UNIQUE INDEX IF NOT EXISTS "OrganizationMember_organizationId_userId_key"
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "Team_slug_key" ON "Team"("slug");
 
--- AddForeignKey
-ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "TeamMember_teamId_userId_key" ON "TeamMember"("teamId", "userId");
 
--- AddForeignKey
-ALTER TABLE "OrganizationMember" ADD CONSTRAINT "OrganizationMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "TeamInvitation_token_key" ON "TeamInvitation"("token");
 
--- AddForeignKey
-ALTER TABLE "Team" ADD CONSTRAINT "Team_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "MeetingShare_shareToken_key" ON "MeetingShare"("shareToken");
 
--- AddForeignKey
-ALTER TABLE "Meeting" ADD CONSTRAINT "Meeting_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "Invoice_invoiceNumber_key" ON "Invoice"("invoiceNumber");
 
--- AddForeignKey
-ALTER TABLE "Meeting" ADD CONSTRAINT "Meeting_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX IF NOT EXISTS "EmailTemplate_slug_key" ON "EmailTemplate"("slug");
 
--- AddForeignKey
-ALTER TABLE "Meeting" ADD CONSTRAINT "Meeting_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "Meeting_userId_idx" ON "Meeting"("userId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "Meeting_teamId_idx" ON "Meeting"("teamId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "Meeting_organizationId_idx" ON "Meeting"("organizationId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "Transcript_meetingId_idx" ON "Transcript"("meetingId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "Payment_userId_idx" ON "Payment"("userId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "UsageRecord_userId_idx" ON "UsageRecord"("userId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "SearchHistory_userId_idx" ON "SearchHistory"("userId");
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "Alert_userId_idx" ON "Alert"("userId");

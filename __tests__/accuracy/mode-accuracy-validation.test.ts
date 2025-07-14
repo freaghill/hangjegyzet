@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from '@jest/globals'
 import { calculateWER, calculateCER } from '@/lib/transcription/accuracy-metrics'
-import { processTranscription } from '@/lib/jobs/transcription-processor'
+import { processTranscriptionJob } from '@/lib/jobs/transcription-processor'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -340,7 +340,7 @@ describe('Mode Accuracy Validation', () => {
       
       // Should identify multiple speakers
       expect(result.speakers.length).toBeGreaterThan(1)
-      expect(result.segments.some(s => s.speaker !== result.segments[0].speaker)).toBe(true)
+      expect(result.segments.some((s: any) => s.speaker !== result.segments[0].speaker)).toBe(true)
     })
   })
 })
