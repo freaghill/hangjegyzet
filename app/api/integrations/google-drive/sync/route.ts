@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     if (tokens.expiry_date && tokens.expiry_date < Date.now()) {
       // Refresh token
-      tokens = await googleDrive.refreshAccessToken(integration.refresh_token)
+      tokens = await googleDrive.refreshAccessToken(integration.refresh_token || '')
       
       // Update tokens in database
       await supabase
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
             folder,
             {
               access_token: tokens.access_token || '',
-              refresh_token: tokens.refresh_token,
+              refresh_token: tokens.refresh_token || undefined,
               expiry_date: tokens.expiry_date
             }
           )
