@@ -57,7 +57,7 @@ async function sendUsageLimitWebhooks() {
  * 
  * crons array with:
  * - path: /api/cron/usage-monitoring
- * - schedule: */5 * * * * (every 5 minutes)
+ * - schedule: every 5 minutes (cron expression)
  */
 
 // API Route handler for Vercel Cron
