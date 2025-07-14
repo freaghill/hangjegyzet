@@ -17,9 +17,26 @@ function verifySimplePaySignature(body: string, signature: string): boolean {
   return signature === expectedSignature
 }
 
-function verifyBarionSignature(paymentId: string): boolean {
-  // Barion doesn't use signatures, but we can verify the payment ID exists
-  return !!paymentId
+function verifyBarionSignature(body: string, signature: string | null): boolean {
+  // Barion uses HMAC-SHA256 for webhook signatures
+  if (!signature) return false
+  
+  const secretKey = process.env.BARION_WEBHOOK_SECRET!
+  if (!secretKey) {
+    console.error('BARION_WEBHOOK_SECRET not configured')
+    return false
+  }
+  
+  const expectedSignature = crypto
+    .createHmac('sha256', secretKey)
+    .update(body)
+    .digest('hex')
+  
+  // Timing-safe comparison to prevent timing attacks
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignature)
+  )
 }
 
 export async function POST(request: NextRequest) {
@@ -49,9 +66,26 @@ export async function POST(request: NextRequest) {
     
     // Handle Barion webhook
     else if (provider === 'barion') {
+      // Verify signature before parsing
+      const signature = request.headers.get('x-barion-signature') || 
+                       request.headers.get('barion-signature')
+      
+      if (!verifyBarionSignature(body, signature)) {
+        await auditLogger.log({
+          action: 'webhook.invalid_signature',
+          resource_type: 'payment',
+          status: 'failure',
+          metadata: {
+            provider: 'barion',
+            ip: request.headers.get('x-forwarded-for') || request.ip,
+          },
+        })
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+      }
+
       const data = JSON.parse(body)
-      if (!data.PaymentId || !verifyBarionSignature(data.PaymentId)) {
-        return NextResponse.json({ error: 'Invalid payment ID' }, { status: 401 })
+      if (!data.PaymentId) {
+        return NextResponse.json({ error: 'Invalid payment data' }, { status: 400 })
       }
 
       await handleBarionWebhook(data, supabase)

@@ -73,11 +73,31 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
     
-    // Check if user is admin (this is a basic check, actual admin verification happens in the admin layout)
-    const adminEmails = (process.env.ADMIN_EMAILS || '').split(',').filter(Boolean)
-    if (!adminEmails.includes(user.email || '')) {
-      // For non-whitelisted users, the actual role check will happen server-side
-      // This is just a basic client-side protection
+    // Check actual user role from database
+    const { data: userRecord, error: userError } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    
+    if (userError || userRecord?.role !== 'admin') {
+      // Log unauthorized access attempt
+      await supabase.from('audit_logs').insert({
+        user_id: user.id,
+        action: 'unauthorized_admin_access',
+        resource_type: 'admin_panel',
+        ip_address: request.headers.get('x-forwarded-for') || request.ip,
+        user_agent: request.headers.get('user-agent'),
+        path: request.nextUrl.pathname,
+        metadata: {
+          email: user.email,
+          attempted_at: new Date().toISOString()
+        }
+      })
+      
+      const url = request.nextUrl.clone()
+      url.pathname = '/unauthorized'
+      return NextResponse.redirect(url)
     }
   }
 

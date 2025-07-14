@@ -283,11 +283,27 @@ export class SalesforceCRMService extends BaseCRMService {
   }
   
   async getContacts(query?: string): Promise<CRMContact[]> {
-    const soql = query 
-      ? `SELECT Id, Name, Email, Phone, Account.Name, Title FROM Contact WHERE Email LIKE '%${query}%' LIMIT 50`
-      : `SELECT Id, Name, Email, Phone, Account.Name, Title FROM Contact LIMIT 50`
+    // Use SOSL (Salesforce Object Search Language) for safer searching
+    let endpoint: string
     
-    const response = await fetch(`${this.baseUrl}/query?q=${encodeURIComponent(soql)}`, {
+    if (query) {
+      // Sanitize input and use SOSL for search
+      const sanitizedQuery = query.replace(/['"\\]/g, '\\$&').trim()
+      if (!sanitizedQuery) {
+        // Empty query, return default list
+        endpoint = `${this.baseUrl}/query?q=${encodeURIComponent('SELECT Id, Name, Email, Phone, Account.Name, Title FROM Contact LIMIT 50')}`
+      } else {
+        // Use SOSL for safer searching - automatically handles escaping
+        const sosl = `FIND {${sanitizedQuery}*} IN EMAIL FIELDS RETURNING Contact(Id, Name, Email, Phone, Account.Name, Title) LIMIT 50`
+        endpoint = `${this.baseUrl}/search?q=${encodeURIComponent(sosl)}`
+      }
+    } else {
+      // No query provided, get default list
+      const soql = 'SELECT Id, Name, Email, Phone, Account.Name, Title FROM Contact LIMIT 50'
+      endpoint = `${this.baseUrl}/query?q=${encodeURIComponent(soql)}`
+    }
+    
+    const response = await fetch(endpoint, {
       headers: {
         'Authorization': `Bearer ${this.apiKey}`
       }
@@ -296,7 +312,18 @@ export class SalesforceCRMService extends BaseCRMService {
     if (!response.ok) throw new Error('Failed to fetch contacts')
     
     const data = await response.json()
-    return (data.records || []).map((contact: any) => ({
+    
+    // Handle different response formats (SOSL vs SOQL)
+    let records: any[] = []
+    if (query && data.searchRecords) {
+      // SOSL response format
+      records = data.searchRecords || []
+    } else if (data.records) {
+      // SOQL response format
+      records = data.records
+    }
+    
+    return records.map((contact: any) => ({
       id: contact.Id,
       name: contact.Name,
       email: contact.Email,
@@ -307,13 +334,19 @@ export class SalesforceCRMService extends BaseCRMService {
   }
   
   async getDeals(contactId?: string): Promise<CRMDeal[]> {
-    let soql = `SELECT Id, Name, Amount, StageName, Probability, CloseDate FROM Opportunity`
+    let soql: string
     
     if (contactId) {
-      soql += ` WHERE Id IN (SELECT OpportunityId FROM OpportunityContactRole WHERE ContactId = '${contactId}')`
+      // Validate contactId format (Salesforce IDs are 15 or 18 characters, alphanumeric)
+      if (!/^[a-zA-Z0-9]{15,18}$/.test(contactId)) {
+        throw new Error('Invalid contact ID format')
+      }
+      
+      // Use parameterized subquery - Salesforce doesn't support parameters, but we validated the input
+      soql = `SELECT Id, Name, Amount, StageName, Probability, CloseDate FROM Opportunity WHERE Id IN (SELECT OpportunityId FROM OpportunityContactRole WHERE ContactId = '${contactId}') LIMIT 50`
+    } else {
+      soql = 'SELECT Id, Name, Amount, StageName, Probability, CloseDate FROM Opportunity LIMIT 50'
     }
-    
-    soql += ' LIMIT 50'
     
     const response = await fetch(`${this.baseUrl}/query?q=${encodeURIComponent(soql)}`, {
       headers: {
