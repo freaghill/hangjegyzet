@@ -1,6 +1,6 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
+import { useUser } from '@/hooks/use-user'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { UserAvatar } from '@/components/ui/user-avatar'
@@ -13,7 +13,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
-  const { data: session } = useSession()
+  const { user } = useUser()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
 
@@ -59,9 +59,9 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
 
         <UserAvatar
           user={{
-            name: session?.user?.name || null,
-            image: session?.user?.image || null,
-            email: session?.user?.email || null,
+            name: user?.user_metadata?.full_name || null,
+            image: user?.user_metadata?.avatar_url || null,
+            email: user?.email || null,
           }}
           className="h-8 w-8 cursor-pointer"
           onClick={() => router.push('/settings')}
