@@ -848,7 +848,14 @@ export default function MeetingDetailsPage() {
                   {currentUser && (
                     <CollaborativeAnnotations
                       meetingId={meeting.id}
-                      transcript={meeting.transcript}
+                      transcript={{
+                        text: meeting.transcript.text,
+                        segments: meeting.transcript.segments?.map(seg => ({
+                          start: seg.start_time,
+                          end: seg.end_time,
+                          text: seg.text
+                        }))
+                      }}
                       currentUserId={currentUser}
                     />
                   )}
