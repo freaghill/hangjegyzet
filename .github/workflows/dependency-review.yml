@@ -24,4 +24,4 @@ jobs:
       - name: Check for vulnerable dependencies
         run: |
           npm install -g pnpm
-          pnpm audit --production --audit-level=moderate
+          npm run audit --production --audit-level=moderate
