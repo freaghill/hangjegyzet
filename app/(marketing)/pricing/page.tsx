@@ -592,7 +592,16 @@ function ModeCard({
   description, 
   features, 
   popular 
-}: any) {
+}: {
+  icon: any,
+  name: string,
+  accuracy: string,
+  speed: string,
+  color: 'green' | 'blue' | 'orange',
+  description: string,
+  features: string[],
+  popular?: boolean
+}) {
   const colors = {
     green: 'text-green-600 bg-green-50 border-green-200',
     blue: 'text-blue-600 bg-blue-50 border-blue-200',
