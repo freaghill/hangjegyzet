@@ -2,7 +2,7 @@ import { EmailTemplate, EmailTemplateType } from './types'
 import { welcomeTemplate } from './templates/welcome'
 import { transcriptionCompleteTemplate } from './templates/transcription-complete'
 import { paymentReceiptTemplate } from './templates/payment-receipt'
-import { teamInvitationTemplate } from './templates/team-invitation'
+// import { teamInvitationTemplate } from './templates/team-invitation'
 import { passwordResetTemplate } from './templates/password-reset'
 import { emailVerificationTemplate } from './templates/email-verification'
 
@@ -19,7 +19,7 @@ export class EmailTemplateService {
     this.registerTemplate(welcomeTemplate)
     this.registerTemplate(transcriptionCompleteTemplate)
     this.registerTemplate(paymentReceiptTemplate)
-    this.registerTemplate(teamInvitationTemplate)
+    // this.registerTemplate(teamInvitationTemplate)
     this.registerTemplate(passwordResetTemplate)
     this.registerTemplate(emailVerificationTemplate)
   }
