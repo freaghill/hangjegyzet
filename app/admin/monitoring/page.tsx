@@ -43,7 +43,6 @@ import {
   Area,
   AreaChart
 } from 'recharts'
-import MonitoringDashboard from '@/components/admin/monitoring-dashboard'
 
 interface SystemMetrics {
   cpu: {
