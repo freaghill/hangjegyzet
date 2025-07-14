@@ -145,7 +145,7 @@ export default function TechnicalMonitoringPage() {
               {systemMetrics?.cpu.toFixed(1)}%
             </div>
             <div className={`text-xs ${getStatusColor(systemMetrics?.cpu || 0, { good: 70, warning: 85 })}`}>
-              {systemMetrics?.cpu < 70 ? 'Normális' : systemMetrics?.cpu < 85 ? 'Magas' : 'Kritikus'}
+              {(systemMetrics?.cpu || 0) < 70 ? 'Normális' : (systemMetrics?.cpu || 0) < 85 ? 'Magas' : 'Kritikus'}
             </div>
           </CardContent>
         </Card>
