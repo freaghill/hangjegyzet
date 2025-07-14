@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { googleDrive, GoogleDriveFolder } from '@/lib/integrations/google-drive'
+import { googleDrive, GoogleDriveFolder, type GoogleDriveTokens } from '@/lib/integrations/google-drive'
 
 export async function GET(_request: NextRequest) {
   try {
@@ -23,7 +23,7 @@ export async function GET(_request: NextRequest) {
     }
 
     // Check if token needs refresh
-    let tokens = {
+    let tokens: GoogleDriveTokens = {
       access_token: integration.access_token,
       refresh_token: integration.refresh_token,
       expiry_date: integration.token_expiry ? new Date(integration.token_expiry).getTime() : null,
