@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
             }
 
             // Update last synced time
-            const updatedFolders = watchedFolders.map(f => 
+            const updatedFolders = watchedFolders.map((f: any) => 
               f.id === folder.id 
                 ? { ...f, lastSyncedAt: new Date().toISOString() }
                 : f
