@@ -207,10 +207,7 @@ export default function ApiSettingsPage() {
                     <p className="text-sm text-gray-600 mt-1">
                       Kulcs: {key.keyPreview} • 
                       Létrehozva: {new Date(key.createdAt).toLocaleDateString('hu-HU')}
-                      {key.lastUsedAt && ` • Utoljára használva: ${new Date(key.lastUsedAt).toLocaleDateString('hu-HU')}`}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      Rate limit: {key.rateLimit} kérés/óra
+                      {key.lastUsed && ` • Utoljára használva: ${new Date(key.lastUsed).toLocaleDateString('hu-HU')}`}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
