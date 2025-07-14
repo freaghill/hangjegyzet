@@ -17,12 +17,12 @@ export const LazySettingsPage = lazyRoute(
 )
 
 export const LazyBillingPage = lazyRoute(
-  () => import('./billing/page'),
+  () => import('./settings/billing/page'),
   { ssr: true }
 )
 
 export const LazyIntegrationsPage = lazyRoute(
-  () => import('./integrations/page'),
+  () => import('./settings/integrations/page'),
   { ssr: true }
 )
 
@@ -31,6 +31,6 @@ export const routeLoaders = {
   '/dashboard/analytics': () => import('./analytics/page'),
   '/dashboard/teams': () => import('./teams/page'),
   '/dashboard/settings': () => import('./dashboard/settings/page'),
-  '/dashboard/billing': () => import('./billing/page'),
-  '/dashboard/integrations': () => import('./integrations/page'),
+  '/dashboard/billing': () => import('./settings/billing/page'),
+  '/dashboard/integrations': () => import('./settings/integrations/page'),
 }
