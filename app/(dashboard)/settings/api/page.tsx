@@ -61,9 +61,8 @@ export default function ApiSettingsPage() {
       if (!user || !organization) return
 
       const { key, apiKey } = await generateApiKey(
-        organization.id,
-        user.id,
-        { name: newKeyName }
+        newKeyName,
+        {} // empty permissions for now
       )
       
       setNewKey(key)
