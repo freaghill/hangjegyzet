@@ -722,7 +722,7 @@ export default function MeetingDetailsPage() {
                 currentTime={currentAudioTime}
                 onSegmentClick={(segment) => setCurrentAudioTime(segment.start_time)}
                 title={meeting.title}
-                language={meeting.metadata?.language || 'hu'}
+                language={(meeting.metadata as any)?.language || 'hu'}
                 className="h-[600px]"
               />
             </div>
