@@ -22,7 +22,7 @@ export default function AdminNewPage() {
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null)
 
   useEffect(() => {
-    checkAdminAuth().then(isAdmin => {
+    checkAdminAuthClient().then(isAdmin => {
       if (!isAdmin) {
         redirect('/dashboard')
       }
