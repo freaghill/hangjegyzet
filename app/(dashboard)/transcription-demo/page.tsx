@@ -113,10 +113,8 @@ export default function TranscriptionDemoPage() {
             </CardHeader>
             <CardContent>
               <ModeSelector
-                value={selectedMode}
-                onChange={setSelectedMode}
-                showPricing={true}
-                userTier="profi"
+                selectedMode={selectedMode}
+                onModeChange={setSelectedMode}
               />
             </CardContent>
           </Card>
