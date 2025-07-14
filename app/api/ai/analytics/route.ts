@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
     trackMetric('api.ai.analytics.success', 1, {
       user_id: user.id,
       organization_id: meeting.organization_id,
-      processing_time: Date.now() - startTime
+      processing_time: String(Date.now() - startTime)
     })
     
     // Cache the results for 1 hour
