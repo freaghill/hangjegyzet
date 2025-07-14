@@ -40,7 +40,7 @@ export default function ApiSettingsPage() {
 
   const loadApiKeys = async () => {
     try {
-      const keys = await listApiKeys(organization!.id)
+      const keys = await listApiKeys()
       setApiKeys(keys)
     } catch (error) {
       console.error('Error loading API keys:', error)
