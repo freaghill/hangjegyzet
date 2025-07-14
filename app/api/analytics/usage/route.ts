@@ -34,9 +34,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = await createClient()
+    const { data: { user }, error } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (error || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     const usageRecord = await prisma.usageRecord.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         type: data.type,
         quantity: data.quantity,
         metadata: data.metadata || {}
