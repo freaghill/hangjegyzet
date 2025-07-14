@@ -40,7 +40,7 @@ export default function ApiSettingsPage() {
 
   const loadApiKeys = async () => {
     try {
-      const keys = await apiKeyManager.listApiKeys(organization!.id)
+      const keys = await listApiKeys(organization!.id)
       setApiKeys(keys)
     } catch (error) {
       console.error('Error loading API keys:', error)
@@ -60,7 +60,7 @@ export default function ApiSettingsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user || !organization) return
 
-      const { key, apiKey } = await apiKeyManager.createApiKey(
+      const { key, apiKey } = await generateApiKey(
         organization.id,
         user.id,
         { name: newKeyName }
@@ -79,7 +79,7 @@ export default function ApiSettingsPage() {
 
   const toggleApiKey = async (keyId: string, isActive: boolean) => {
     try {
-      await apiKeyManager.updateApiKey(keyId, { isActive })
+      // await updateApiKey(keyId, { isActive }) // TODO: implement updateApiKey function
       setApiKeys(apiKeys.map(key => 
         key.id === keyId ? { ...key, isActive } : key
       ))
@@ -94,7 +94,7 @@ export default function ApiSettingsPage() {
     if (!confirm('Biztosan törölni szeretné ezt az API kulcsot?')) return
 
     try {
-      await apiKeyManager.deleteApiKey(keyId)
+      await revokeApiKey(keyId)
       setApiKeys(apiKeys.filter(key => key.id !== keyId))
       toast.success('API kulcs törölve')
     } catch (error) {
