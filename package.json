@@ -122,7 +122,7 @@
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.42.0",
+    "@supabase/supabase-js": "^2.50.5",
     "@tiptap/extension-collaboration": "^2.25.0",
     "@tiptap/extension-mention": "^2.25.0",
     "@tiptap/extension-placeholder": "^2.25.0",
