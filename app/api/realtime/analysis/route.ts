@@ -145,6 +145,10 @@ export async function GET(request: NextRequest) {
           }
         })
       
+      case 'stream':
+        // Handle SSE stream for real-time updates
+        return handleSSE(request, meetingId, user, meeting, profile)
+      
       default:
         return NextResponse.json(
           { error: 'Invalid analysis type' },
@@ -285,56 +289,15 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Server-Sent Events endpoint for real-time analysis updates
-export async function SSE(request: NextRequest) {
+// Server-Sent Events handler for real-time analysis updates
+async function handleSSE(
+  request: NextRequest,
+  meetingId: string,
+  user: any,
+  meeting: any,
+  profile: any
+) {
   try {
-    const supabase = await createClient()
-    
-    // Check authentication
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-    
-    const meetingId = request.nextUrl.searchParams.get('meetingId')
-    
-    if (!meetingId) {
-      return NextResponse.json(
-        { error: 'Meeting ID required' },
-        { status: 400 }
-      )
-    }
-    
-    // Verify access
-    const { data: meeting } = await supabase
-      .from('meetings')
-      .select('organization_id')
-      .eq('id', meetingId)
-      .single()
-    
-    if (!meeting) {
-      return NextResponse.json(
-        { error: 'Meeting not found' },
-        { status: 404 }
-      )
-    }
-    
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('organization_id')
-      .eq('id', user.id)
-      .single()
-    
-    if (!profile || profile.organization_id !== meeting.organization_id) {
-      return NextResponse.json(
-        { error: 'Access denied' },
-        { status: 403 }
-      )
-    }
-    
     const liveAnalysis = getLiveAnalysisEngine()
     const analyticsStore = getAnalyticsStore()
     
