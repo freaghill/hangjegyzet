@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (tokens.expiry_date && tokens.expiry_date < Date.now()) {
-      tokens = await googleCalendar.refreshAccessToken(integration.refresh_token)
+      tokens = await googleCalendar.refreshAccessToken(integration.refresh_token || '')
       
       await supabase
         .from('google_calendar_integrations')
@@ -148,7 +148,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (tokens.expiry_date && tokens.expiry_date < Date.now()) {
-      tokens = await googleCalendar.refreshAccessToken(integration.refresh_token)
+      tokens = await googleCalendar.refreshAccessToken(integration.refresh_token || '')
       
       await supabase
         .from('google_calendar_integrations')
