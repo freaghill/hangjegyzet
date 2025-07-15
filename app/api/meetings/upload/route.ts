@@ -117,14 +117,14 @@ export async function POST(request: NextRequest) {
       })
       .single()
 
-    if (currentUsage && !currentUsage.available) {
+    if (currentUsage && !(currentUsage as any).available) {
       return NextResponse.json({ 
-        error: `Elérte a ${mode} mód havi limitjét (${currentUsage.used}/${currentUsage.limit_minutes} perc). Kérjük válasszon másik módot vagy frissítsen magasabb csomagra.`,
+        error: `Elérte a ${mode} mód havi limitjét (${(currentUsage as any).used}/${(currentUsage as any).limit_minutes} perc). Kérjük válasszon másik módot vagy frissítsen magasabb csomagra.`,
         modeStatus: {
           mode,
-          used: currentUsage.used,
-          limit: currentUsage.limit_minutes,
-          remaining: currentUsage.remaining
+          used: (currentUsage as any).used,
+          limit: (currentUsage as any).limit_minutes,
+          remaining: (currentUsage as any).remaining
         }
       }, { status: 403 })
     }
@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
       processingOptions.enableAccuracyMonitoring = formData.get('enableAccuracyMonitoring') === 'true'
     }
     
-    const multiPassCount = formData.get('multiPassCount') ? parseInt(formData.get('multiPassCount') as string) : processingOptions.multiPassCount
+    const multiPassCount = formData.get('multiPassCount') ? parseInt(formData.get('multiPassCount') as string) : (processingOptions as any).multiPassCount
     const speakerCount = formData.get('speakerCount') ? parseInt(formData.get('speakerCount') as string) : undefined
     const customVocabulary = formData.get('customVocabulary') as string | null
     const contextHints = formData.get('contextHints') ? (formData.get('contextHints') as string).split(',').map(h => h.trim()) : undefined
@@ -349,13 +349,13 @@ export async function POST(request: NextRequest) {
         startTime,
         endTime,
         language: 'hu',
-        customVocabulary,
+        customVocabulary: customVocabulary || undefined,
         // Mode-based processing options
         ...processingOptions,
         multiPassCount,
         speakerCount,
         contextHints,
-        minAudioQuality,
+        minAudioQuality: minAudioQuality || undefined,
         minConfidenceScore
       }
     }).catch(error => {
@@ -373,9 +373,9 @@ export async function POST(request: NextRequest) {
       message: `Fájl sikeresen feltöltve. A feldolgozás ${mode} módban hamarosan elkezdődik.`,
       modeStatus: currentUsage ? {
         mode,
-        used: currentUsage.used,
-        limit: currentUsage.limit_minutes,
-        remaining: currentUsage.remaining
+        used: (currentUsage as any).used,
+        limit: (currentUsage as any).limit_minutes,
+        remaining: (currentUsage as any).remaining
       } : undefined
     })
   } catch (error) {

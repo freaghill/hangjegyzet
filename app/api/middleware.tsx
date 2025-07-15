@@ -20,12 +20,12 @@ export function withLogging(
     })
     
     // Log request
-    requestLogger.http('Incoming request')
+    ;(requestLogger as any).http('Incoming request')
     
     try {
       // Add logger to request
-      (req as any).log = requestLogger
-      (req as any).requestId = requestId
+      ;(req as any).log = requestLogger;
+      (req as any).requestId = requestId;
       
       // Execute handler
       const response = await handler(req, context)
@@ -34,14 +34,14 @@ export function withLogging(
       const duration = Date.now() - start
       
       // Log response
-      requestLogger.http('Request completed', {
+      ;(requestLogger as any).http('Request completed', {
         statusCode: response.status,
         duration,
       })
       
       // Log slow requests
       if (duration > 1000) {
-        requestLogger.warn('Slow request detected', {
+        ;(requestLogger as any).warn('Slow request detected', {
           duration,
           threshold: 1000,
         })
@@ -56,7 +56,7 @@ export function withLogging(
       const duration = Date.now() - start
       
       // Log error
-      requestLogger.error('Request failed', {
+      ;(requestLogger as any).error('Request failed', {
         error,
         duration,
       })

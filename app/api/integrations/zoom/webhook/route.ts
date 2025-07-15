@@ -116,7 +116,7 @@ async function handleRecordingCompleted(payload: any) {
   }
 
   // Get participant information
-  let participants = []
+  let participants: any[] = []
   try {
     const zoomClient = await getZoomClient(integration.user_id)
     if (zoomClient) {

@@ -91,7 +91,7 @@ export async function POST(
       .eq('id', user.id)
       .single()
     
-    if (!profile || profile.organization_id !== annotation.meetings.organization_id) {
+    if (!profile || profile.organization_id !== (annotation.meetings as any).organization_id) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
     

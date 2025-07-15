@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { googleDrive } from '@/lib/integrations/google-drive'
+import { googleDrive, type GoogleDriveTokens } from '@/lib/integrations/google-drive'
 
 // This endpoint can be called by a cron job to sync all active integrations
 export async function GET(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     for (const integration of integrations) {
       try {
         // Check if token needs refresh
-        let tokens = {
+        let tokens: GoogleDriveTokens = {
           access_token: integration.access_token,
           refresh_token: integration.refresh_token,
           expiry_date: integration.token_expiry ? new Date(integration.token_expiry).getTime() : null,
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
         if (tokens.expiry_date && tokens.expiry_date < Date.now()) {
           // Refresh token
-          tokens = await googleDrive.refreshAccessToken(integration.refresh_token)
+          tokens = await googleDrive.refreshAccessToken(integration.refresh_token || '')
           
           // Update tokens in database
           await supabase
@@ -101,7 +101,7 @@ export async function GET(request: NextRequest) {
             }
 
             // Update last synced time
-            const updatedFolders = watchedFolders.map(f => 
+            const updatedFolders = watchedFolders.map((f: any) => 
               f.id === folder.id 
                 ? { ...f, lastSyncedAt: new Date().toISOString() }
                 : f

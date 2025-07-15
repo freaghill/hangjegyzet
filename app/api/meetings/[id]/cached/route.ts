@@ -60,7 +60,7 @@ async function handler(
 // Export with cache middleware
 export const GET = withCache(handler, {
   ttl: 300, // 5 minutes
-  keyGenerator: (req) => {
+  key: (req) => {
     const url = new URL(req.url)
     const meetingId = url.pathname.split('/').slice(-2)[0]
     return `meeting:${meetingId}`

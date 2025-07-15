@@ -133,7 +133,7 @@ export async function GET(request: NextRequest) {
     // Get meeting with metadata
     const { data: meeting, error: meetingError } = await supabase
       .from('meetings')
-      .select('id, status, metadata, error_message')
+      .select('id, status, metadata, error_message, organization_id')
       .eq('id', meetingId)
       .single()
 

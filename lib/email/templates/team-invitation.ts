@@ -138,3 +138,5 @@ A Hangjegyzet csapata
   category: 'transactional',
   language: 'hu'
 }
+
+export default teamInvitationTemplate

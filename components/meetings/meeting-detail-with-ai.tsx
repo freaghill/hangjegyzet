@@ -19,7 +19,8 @@ import {
   TrendingUp,
   Sparkles,
   ChevronRight,
-  Info
+  Info,
+  CheckCircle
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
