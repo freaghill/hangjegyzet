@@ -24,8 +24,8 @@ export function withLogging(
     
     try {
       // Add logger to request
-      (req as any).log = requestLogger
-      (req as any).requestId = requestId
+      ;(req as any).log = requestLogger;
+      (req as any).requestId = requestId;
       
       // Execute handler
       const response = await handler(req, context)
