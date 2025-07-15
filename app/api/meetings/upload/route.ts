@@ -198,7 +198,7 @@ export async function POST(request: NextRequest) {
       processingOptions.enableAccuracyMonitoring = formData.get('enableAccuracyMonitoring') === 'true'
     }
     
-    const multiPassCount = formData.get('multiPassCount') ? parseInt(formData.get('multiPassCount') as string) : processingOptions.multiPassCount
+    const multiPassCount = formData.get('multiPassCount') ? parseInt(formData.get('multiPassCount') as string) : (processingOptions as any).multiPassCount
     const speakerCount = formData.get('speakerCount') ? parseInt(formData.get('speakerCount') as string) : undefined
     const customVocabulary = formData.get('customVocabulary') as string | null
     const contextHints = formData.get('contextHints') ? (formData.get('contextHints') as string).split(',').map(h => h.trim()) : undefined
