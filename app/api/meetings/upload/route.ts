@@ -349,13 +349,13 @@ export async function POST(request: NextRequest) {
         startTime,
         endTime,
         language: 'hu',
-        customVocabulary,
+        customVocabulary: customVocabulary || undefined,
         // Mode-based processing options
         ...processingOptions,
         multiPassCount,
         speakerCount,
         contextHints,
-        minAudioQuality,
+        minAudioQuality: minAudioQuality || undefined,
         minConfidenceScore
       }
     }).catch(error => {
