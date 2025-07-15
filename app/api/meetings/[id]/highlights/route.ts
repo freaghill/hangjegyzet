@@ -174,7 +174,7 @@ export async function POST(
     
     // Send notification for highlights created
     const organizationId = (meeting.profiles as any)?.organization_id || meeting.organization_id
-    if (organizationId && highlights.length > 0) {
+    if (organizationId && highlights.keyMoments.length > 0) {
       try {
         await notificationManager.sendNotification({
           eventType: 'highlight_created',
