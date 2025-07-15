@@ -76,8 +76,8 @@ export class TranscriptionProcessor {
         })
         .single()
         
-      if (modeAvailability && !modeAvailability.available) {
-        throw new Error(`Nincs elegendő ${mode} mód perc a havi keretben (${modeAvailability.used}/${modeAvailability.limit_minutes} használva)`)
+      if (modeAvailability && !(modeAvailability as any).available) {
+        throw new Error(`Nincs elegendő ${mode} mód perc a havi keretben (${(modeAvailability as any).used}/${(modeAvailability as any).limit_minutes} használva)`)
       }
 
       let result
