@@ -84,7 +84,7 @@ export const GET = withCache(async (request: NextRequest) => {
     } as SearchQuery & { sort?: string; order?: string; fields?: string[]; includeTranscript?: boolean }
 
     const searchService = new SearchService()
-    const results = await searchService.searchOptimized(searchQuery)
+    const results = await searchService.search(searchQuery)
     
     // Create paginated response
     const response = NextResponse.json(
