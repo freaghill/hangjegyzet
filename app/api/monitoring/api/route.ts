@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Group by endpoint and method
-    const metricsMap = new Map<string, ApiMetric>()
+    const metricsMap = new Map<string, ApiMetric & { responseTimes: number[], errorCount: number }>()
     
     apiLogs.forEach(log => {
       const key = `${log.method} ${log.endpoint}`
