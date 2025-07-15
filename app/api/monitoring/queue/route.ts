@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
     
     // Group by queue name
-    const queuesMap = new Map<string, QueueMetric>()
+    const queuesMap = new Map<string, QueueMetric & { totalProcessingTime: number, processedCount: number }>()
     
     jobLogs.forEach(job => {
       const existing = queuesMap.get(job.queue_name) || {
