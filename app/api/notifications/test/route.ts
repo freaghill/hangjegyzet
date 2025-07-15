@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
           targetEmail,
           850,
           1000,
-          profile?.organizations?.subscription_plan || 'Professional'
+          (profile?.organizations as any)?.subscription_plan || 'Professional'
         )
         break
         
