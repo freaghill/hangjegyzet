@@ -373,9 +373,9 @@ export async function POST(request: NextRequest) {
       message: `Fájl sikeresen feltöltve. A feldolgozás ${mode} módban hamarosan elkezdődik.`,
       modeStatus: currentUsage ? {
         mode,
-        used: currentUsage.used,
-        limit: currentUsage.limit_minutes,
-        remaining: currentUsage.remaining
+        used: (currentUsage as any).used,
+        limit: (currentUsage as any).limit_minutes,
+        remaining: (currentUsage as any).remaining
       } : undefined
     })
   } catch (error) {
