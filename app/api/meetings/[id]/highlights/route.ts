@@ -183,7 +183,7 @@ export async function POST(
           data: {
             meetingTitle: meeting.title || 'Névtelen megbeszélés',
             meetingId: params.id,
-            highlights: highlights.map((h: any) => ({
+            highlights: highlights.keyMoments.map((h: any) => ({
               text: h.text,
               speaker: h.speaker,
               timestamp: h.timestamp?.toString() || '0'
