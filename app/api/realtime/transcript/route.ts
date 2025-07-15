@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
       meeting: {
         id: meeting.id,
         title: meeting.title,
-        organization: meeting.organizations.name,
+        organization: (meeting.organizations as any).name,
         status: meeting.status,
         duration: meeting.duration_seconds || (liveContext ? Math.floor((Date.now() - liveContext.startTime) / 1000) : 0),
         createdAt: meeting.created_at,
