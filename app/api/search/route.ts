@@ -89,7 +89,7 @@ export const GET = withCache(async (request: NextRequest) => {
     // Create paginated response
     const response = NextResponse.json(
       createPaginatedResponse(
-        results.meetings,
+        results.results,
         results.total,
         pagination
       )
