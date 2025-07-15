@@ -117,14 +117,14 @@ export async function POST(request: NextRequest) {
       })
       .single()
 
-    if (currentUsage && !currentUsage.available) {
+    if (currentUsage && !(currentUsage as any).available) {
       return NextResponse.json({ 
-        error: `Elérte a ${mode} mód havi limitjét (${currentUsage.used}/${currentUsage.limit_minutes} perc). Kérjük válasszon másik módot vagy frissítsen magasabb csomagra.`,
+        error: `Elérte a ${mode} mód havi limitjét (${(currentUsage as any).used}/${(currentUsage as any).limit_minutes} perc). Kérjük válasszon másik módot vagy frissítsen magasabb csomagra.`,
         modeStatus: {
           mode,
-          used: currentUsage.used,
-          limit: currentUsage.limit_minutes,
-          remaining: currentUsage.remaining
+          used: (currentUsage as any).used,
+          limit: (currentUsage as any).limit_minutes,
+          remaining: (currentUsage as any).remaining
         }
       }, { status: 403 })
     }
