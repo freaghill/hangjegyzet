@@ -152,7 +152,7 @@ export default function DashboardPage() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Meetingek</p>
+                    <p className="text-sm font-medium text-gray-600">Megbeszélések</p>
                     <p className="text-2xl font-bold">{recentMeetings.length}</p>
                   </div>
                   <FileAudio className="h-8 w-8 text-blue-600" />
@@ -180,7 +180,7 @@ export default function DashboardPage() {
           <Card className="glass-effect">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Legutóbbi meetingek</CardTitle>
+                <CardTitle>Legutóbbi megbeszélések</CardTitle>
                 <Link href="/meetings">
                   <Button variant="outline" size="sm">
                     Összes megtekintése
@@ -277,7 +277,7 @@ export default function DashboardPage() {
                 <span className="text-lg">⚖️</span>
                 <div>
                   <p className="font-semibold">Balanced mód</p>
-                  <p className="text-gray-600">Üzleti meetingekhez, optimális ár-érték arány</p>
+                  <p className="text-gray-600">Üzleti megbeszélésekhez, optimális ár-érték arány</p>
                 </div>
               </div>
               <div className="flex items-start gap-2">

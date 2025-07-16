@@ -8,11 +8,11 @@ import Link from 'next/link'
 import { SUBSCRIPTION_PLANS, formatPrice, calculateYearlyPrice } from '@/lib/payments/subscription-plans'
 
 export const metadata: Metadata = {
-  title: 'Árazás - HangJegyzet.AI | Magyar Meeting Transcription Platform',
+  title: 'Árazás - HangJegyzet | Magyar Meeting Transcription Platform',
   description: 'Válasszon 97%+ pontosságú AI-alapú meeting átírási csomagjaink közül. Starter €49-tól Enterprise megoldásokig. 14 napos ingyenes próba.',
   keywords: 'meeting átírás árak, hangjegyzet árazás, transzkripció költség, AI átírás díjak, magyar beszédfelismerés ár',
   openGraph: {
-    title: 'HangJegyzet.AI Árazás - Meeting Intelligence Platform',
+    title: 'HangJegyzet Árazás - Meeting Intelligence Platform',
     description: 'AI-alapú meeting átírás és elemzés. Starter, Professional, Business és Enterprise csomagok.',
     images: ['/pricing-og.png'],
   },
@@ -105,7 +105,7 @@ export default function PricingPage() {
               Hamarosan indul
             </Badge>
             <Badge variant="secondary">
-              14 napos ingyenes próba • Nincs bankkártya
+              14 napos ingyenes próba • Bankkártya nélkül
             </Badge>
           </div>
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
@@ -210,7 +210,7 @@ export default function PricingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <ModeCard
               icon={Zap}
-              name="Fast Mode"
+              name="Gyors mód"
               accuracy="90-93%"
               speed="Valós idő"
               color="green"
@@ -218,14 +218,14 @@ export default function PricingPage() {
               features={[
                 'Azonnali eredmények',
                 'Költséghatékony',
-                'Informális meetingekhez ideális',
+                'Informális megbeszélésekhez ideális',
                 'Jó minőségű hanganyagokhoz'
               ]}
             />
             
             <ModeCard
               icon={Scale}
-              name="Balanced Mode"
+              name="Kiegyensúlyozott mód"
               accuracy="94-96%"
               speed="2-3 perc"
               color="blue"
@@ -233,7 +233,7 @@ export default function PricingPage() {
               features={[
                 'AI hangjavítás',
                 'Szókészlet optimalizálás',
-                'Üzleti meetingekhez',
+                'Üzleti megbeszélésekhez',
                 'Legjobb ár-érték arány'
               ]}
               popular
@@ -241,7 +241,7 @@ export default function PricingPage() {
             
             <ModeCard
               icon={Target}
-              name="Precision Mode"
+              name="Precíz mód"
               accuracy="97%+"
               speed="5-8 perc"
               color="orange"
@@ -302,7 +302,7 @@ export default function PricingPage() {
       <section className="py-20 px-4">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">
-            Kik használják a <span className="text-blue-600">HangJegyzet.AI-t?</span>
+            Kik használják a <span className="text-blue-600">HangJegyzetet?</span>
           </h2>
           <p className="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto">
             Tervezve magyar vállalkozások és szervezetek igényeire
@@ -316,7 +316,7 @@ export default function PricingPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  Tökéletes napi stand-upok, projekt meetingek és stratégiai megbeszélések rögzítésére.
+                  Tökéletes napi stand-upok, projekt megbeszélések és stratégiai megbeszélések rögzítésére.
                 </p>
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li>• Automatikus teendő kiosztás</li>
@@ -411,7 +411,7 @@ export default function PricingPage() {
       <section className="py-20 px-4 bg-gray-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">
-            Kezdje el még ma a <span className="text-blue-600">meetingek átalakítását</span>
+            Kezdje el még ma a <span className="text-blue-600">megbeszélések átalakítását</span>
           </h2>
           <p className="text-xl text-gray-600 mb-8">
             Modern AI-alapú meeting intelligencia platform magyar vállalkozások számára
@@ -482,12 +482,18 @@ function PricingCards({ plans, yearly }: { plans: string[], yearly: boolean }) {
               </div>
               
               <div className="mb-2">
-                <span className="text-4xl font-bold">
-                  {formatPrice(price, plan.currency)}
-                </span>
-                <span className="text-gray-600 ml-2">
-                  /{yearly ? 'év' : 'hó'}
-                </span>
+                {isEnterprise ? (
+                  <span className="text-4xl font-bold">Egyedi</span>
+                ) : (
+                  <>
+                    <span className="text-4xl font-bold">
+                      {formatPrice(price, plan.currency)}
+                    </span>
+                    <span className="text-gray-600 ml-2">
+                      /{yearly ? 'év' : 'hó'}
+                    </span>
+                  </>
+                )}
               </div>
               
               {yearly && (
@@ -570,14 +576,20 @@ function ModeAllocation({ mode, minutes, icon: Icon, color }: {
   icon: any,
   color: string 
 }) {
+  const modeNames = {
+    'Fast': 'Gyors',
+    'Balanced': 'Kiegyensúlyozott', 
+    'Precision': 'Precíz'
+  }
+  
   return (
     <div className="flex items-center justify-between text-sm">
       <div className="flex items-center gap-2">
         <Icon className={`w-4 h-4 ${color}`} />
-        <span>{mode}</span>
+        <span>{modeNames[mode as keyof typeof modeNames] || mode}</span>
       </div>
       <span className="font-semibold">
-        {minutes === -1 ? 'Korlátlan' : minutes === 0 ? '-' : `${minutes} perc`}
+        {minutes === -1 ? 'Korlátlan' : minutes === 0 ? '❌' : `${minutes} perc`}
       </span>
     </div>
   )
@@ -612,7 +624,7 @@ function ModeCard({
     <Card className={`relative ${popular ? 'ring-2 ring-blue-500 shadow-lg' : ''}`}>
       {popular && (
         <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-          Recommended
+          Ajánlott
         </Badge>
       )}
       

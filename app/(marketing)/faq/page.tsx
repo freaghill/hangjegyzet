@@ -17,8 +17,8 @@ const faqCategories = [
     name: 'Általános',
     items: [
       {
-        question: 'Mi az a HangJegyzet.AI?',
-        answer: 'A HangJegyzet.AI egy mesterséges intelligencia alapú meeting jegyzetelő és átíró szolgáltatás, amely automatikusan rögzíti, átírja és összefoglalja az üzleti megbeszéléseit. 97%+ pontossággal dolgozik és támogatja a magyar nyelvet.'
+        question: 'Mi az a HangJegyzet?',
+        answer: 'A HangJegyzet egy mesterséges intelligencia alapú meeting jegyzetelő és átíró szolgáltatás, amely automatikusan rögzíti, átírja és összefoglalja az üzleti megbeszéléseit. 97%+ pontossággal dolgozik és támogatja a magyar nyelvet.'
       },
       {
         question: 'Hogyan működik a szolgáltatás?',

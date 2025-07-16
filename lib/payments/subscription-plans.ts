@@ -215,6 +215,137 @@ export const SUBSCRIPTION_PLANS: Record<string, SubscriptionPlanDetails> = {
       'Egyedi AI képzés',
     ],
   },
+  
+  // EUR pricing plans for pricing page
+  starter: {
+    id: 'starter',
+    name: 'Starter',
+    price: 49, // EUR
+    currency: 'EUR',
+    duration: 30,
+    limits: {
+      minutesPerMonth: 600,
+      modeAllocation: {
+        fast: 500,
+        balanced: 100,
+        precision: 0,
+      },
+      users: 3,
+      storage: 90,
+      maxMeetingDuration: 120,
+      maxPrecisionPerMeeting: 0,
+      maxPrecisionPerDay: 0,
+    },
+    features: [
+      '500 perc Fast mód',
+      '100 perc Balanced mód',
+      '3 felhasználó',
+      'AI összefoglaló',
+      'Teendők kinyerése',
+      'Export (PDF, Word)',
+      'Google Drive integráció',
+      'Email támogatás',
+    ],
+  },
+  
+  professional: {
+    id: 'professional',
+    name: 'Professional',
+    price: 99, // EUR
+    currency: 'EUR',
+    duration: 30,
+    popular: true,
+    limits: {
+      minutesPerMonth: 2550,
+      modeAllocation: {
+        fast: 2000,
+        balanced: 500,
+        precision: 50,
+      },
+      users: 10,
+      storage: -1,
+      maxMeetingDuration: 180,
+      maxPrecisionPerMeeting: 30,
+      maxPrecisionPerDay: 50,
+    },
+    features: [
+      '✅ 2000 perc Fast mód',
+      '✅ 500 perc Balanced mód',
+      '✅ 50 perc Precision mód',
+      '10 felhasználó',
+      'Sentiment analysis',
+      'Meeting analytics',
+      'Zoom & Teams integráció',
+      'API hozzáférés (1000/hó)',
+      'Prioritás támogatás',
+    ],
+  },
+  
+  business: {
+    id: 'business',
+    name: 'Business',
+    price: 299, // EUR
+    currency: 'EUR',
+    duration: 30,
+    limits: {
+      minutesPerMonth: 12200,
+      modeAllocation: {
+        fast: 10000,
+        balanced: 2000,
+        precision: 200,
+      },
+      users: 50,
+      storage: -1,
+      maxMeetingDuration: 180,
+      maxPrecisionPerMeeting: 60,
+      maxPrecisionPerDay: 100,
+    },
+    features: [
+      '✅ 10,000 perc Fast mód',
+      '✅ 2,000 perc Balanced mód',
+      '✅ 200 perc Precision mód',
+      '50 felhasználó',
+      'Többnyelvű támogatás',
+      'Egyéni AI modellek',
+      'SSO integráció',
+      'Korlátlan API',
+      'SLA garancia 99.9%',
+      'Dedikált support',
+    ],
+  },
+  
+  enterprise: {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: 0, // Custom pricing
+    currency: 'EUR',
+    duration: 30,
+    limits: {
+      minutesPerMonth: -1,
+      modeAllocation: {
+        fast: -1,
+        balanced: -1,
+        precision: -1,
+      },
+      users: -1,
+      storage: -1,
+      maxMeetingDuration: 240,
+      maxPrecisionPerMeeting: -1,
+      maxPrecisionPerDay: -1,
+    },
+    features: [
+      '✅ Korlátlan minden mód',
+      '✅ Korlátlan felhasználó',
+      '✅ Dedikált infrastruktúra',
+      'Executive insights',
+      'On-premise telepítés',
+      'HIPAA compliance',
+      'Egyéni integrációk',
+      '99.99% SLA',
+      '24/7 támogatás',
+      'Egyedi AI képzés',
+    ],
+  },
 }
 
 // Legacy support - map old plan names

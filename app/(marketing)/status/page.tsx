@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 
 export const metadata: Metadata = {
-  title: 'Rendszer Állapot - HangJegyzet.AI',
-  description: 'Valós idejű rendszer állapot és szolgáltatás elérhetőség a HangJegyzet.AI platformon.',
+  title: 'Rendszer Állapot - HangJegyzet',
+  description: 'Valós idejű rendszer állapot és szolgáltatás elérhetőség a HangJegyzet platformon.',
 }
 
 // This would typically come from an API or monitoring service
@@ -116,7 +116,7 @@ export default function StatusPage() {
             Rendszer Állapot
           </h1>
           <p className="text-xl text-gray-600">
-            Valós idejű információk a HangJegyzet.AI szolgáltatások elérhetőségéről
+            Valós idejű információk a HangJegyzet szolgáltatások elérhetőségéről
           </p>
         </div>
       </section>

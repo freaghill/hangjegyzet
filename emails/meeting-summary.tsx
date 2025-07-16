@@ -49,7 +49,7 @@ export const MeetingSummaryEmail = ({
     </Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={logo}>HangJegyzet.AI</Text>
+        <Text style={logo}>HangJegyzet</Text>
         
         <Heading style={h1}>Meeting Összefoglaló 📋</Heading>
         
@@ -156,7 +156,7 @@ export const MeetingSummaryEmail = ({
         </Text>
         
         <Text style={footer}>
-          HangJegyzet.AI • AI-alapú meeting intelligencia
+          HangJegyzet • AI-alapú meeting intelligencia
         </Text>
       </Container>
     </Body>

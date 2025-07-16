@@ -24,6 +24,7 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>
 ) => render(ui, { wrapper: AllTheProviders, ...options })
 
-// Re-export everything
+// Re-export everything with proper types
 export * from '@testing-library/react'
 export { customRender as render }
+export { screen, fireEvent, waitFor } from '@testing-library/react'

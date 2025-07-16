@@ -30,7 +30,7 @@ export class EmailService {
 
   private constructor() {
     this.fromEmail = process.env.SENDGRID_FROM_EMAIL || 'noreply@hangjegyzet.ai'
-    this.fromName = process.env.SENDGRID_FROM_NAME || 'HangJegyzet.AI'
+    this.fromName = process.env.SENDGRID_FROM_NAME || 'HangJegyzet'
   }
 
   static getInstance(): EmailService {
@@ -97,7 +97,7 @@ export class EmailService {
     
     await this.sendReactEmail(
       user.email,
-      'Üdvözöljük a HangJegyzet.AI-ban! 🎉',
+      'Üdvözöljük a HangJegyzetben! 🎉',
       React.createElement(WelcomeEmail, {
         userEmail: user.email,
         userName: user.name
@@ -108,7 +108,7 @@ export class EmailService {
   async sendPasswordResetEmail(email: string, resetUrl: string): Promise<void> {
     await this.sendEmail({
       to: email,
-      subject: 'Jelszó visszaállítás - HangJegyzet.AI',
+      subject: 'Jelszó visszaállítás - HangJegyzet',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2>Jelszó visszaállítás</h2>
@@ -121,7 +121,7 @@ export class EmailService {
           <p>Ha nem Ön kérte a jelszó visszaállítást, hagyja figyelmen kívül ezt az emailt.</p>
           <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e5e5;">
           <p style="color: #666; font-size: 14px;">
-            HangJegyzet.AI - AI-alapú meeting jegyzetelés<br>
+            HangJegyzet - AI-alapú meeting jegyzetelés<br>
             <a href="https://hangjegyzet.ai" style="color: #2563eb;">hangjegyzet.ai</a>
           </p>
         </div>
@@ -138,7 +138,7 @@ export class EmailService {
         
         Ha nem Ön kérte a jelszó visszaállítást, hagyja figyelmen kívül ezt az emailt.
         
-        HangJegyzet.AI - AI-alapú meeting jegyzetelés
+        HangJegyzet - AI-alapú meeting jegyzetelés
         https://hangjegyzet.ai
       `,
     })
@@ -208,15 +208,15 @@ export class EmailService {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2>Csapat meghívó</h2>
-          <p><strong>${inviter}</strong> meghívta Önt, hogy csatlakozzon a <strong>${teamName}</strong> csapathoz a HangJegyzet.AI platformon.</p>
+          <p><strong>${inviter}</strong> meghívta Önt, hogy csatlakozzon a <strong>${teamName}</strong> csapathoz a HangJegyzet platformon.</p>
           <p>A meghívó elfogadásához kattintson az alábbi gombra:</p>
           <a href="${inviteUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: white; text-decoration: none; border-radius: 6px; margin: 16px 0;">
             Meghívó elfogadása
           </a>
-          <p>A HangJegyzet.AI segítségével közösen dolgozhatnak meeting jegyzeteken és átírásokon.</p>
+          <p>A HangJegyzet segítségével közösen dolgozhatnak meeting jegyzeteken és átírásokon.</p>
           <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e5e5;">
           <p style="color: #666; font-size: 14px;">
-            HangJegyzet.AI - AI-alapú meeting jegyzetelés<br>
+            HangJegyzet - AI-alapú meeting jegyzetelés<br>
             <a href="https://hangjegyzet.ai" style="color: #2563eb;">hangjegyzet.ai</a>
           </p>
         </div>
@@ -254,7 +254,7 @@ export class EmailService {
           </a>
           <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e5e5;">
           <p style="color: #666; font-size: 14px;">
-            HangJegyzet.AI - AI-alapú meeting jegyzetelés<br>
+            HangJegyzet - AI-alapú meeting jegyzetelés<br>
             <a href="https://hangjegyzet.ai" style="color: #2563eb;">hangjegyzet.ai</a>
           </p>
         </div>
@@ -317,7 +317,7 @@ export class EmailService {
 
           <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e5e5;">
           <p style="color: #666; font-size: 14px;">
-            HangJegyzet.AI - AI-alapú meeting jegyzetelés<br>
+            HangJegyzet - AI-alapú meeting jegyzetelés<br>
             <a href="https://hangjegyzet.ai" style="color: #2563eb;">hangjegyzet.ai</a>
           </p>
         </div>
@@ -335,7 +335,7 @@ export class EmailService {
         Az átírás megtekintéséhez látogasson el ide:
         ${meeting.transcriptUrl}
         
-        HangJegyzet.AI - AI-alapú meeting jegyzetelés
+        HangJegyzet - AI-alapú meeting jegyzetelés
         https://hangjegyzet.ai
       `,
     })

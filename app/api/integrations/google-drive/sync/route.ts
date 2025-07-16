@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { googleDrive, GoogleDriveFolder } from '@/lib/integrations/google-drive'
+import { googleDrive, GoogleDriveFolder, type GoogleDriveTokens } from '@/lib/integrations/google-drive'
 import { syncAndProcessGoogleDriveFolder } from '@/lib/integrations/google-drive-processor'
 
 export async function POST(request: NextRequest) {
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if token needs refresh
-    let tokens = {
+    let tokens: GoogleDriveTokens = {
       access_token: integration.access_token,
       refresh_token: integration.refresh_token,
       expiry_date: integration.token_expiry ? new Date(integration.token_expiry).getTime() : null,
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     if (tokens.expiry_date && tokens.expiry_date < Date.now()) {
       // Refresh token
-      tokens = await googleDrive.refreshAccessToken(integration.refresh_token)
+      tokens = await googleDrive.refreshAccessToken(integration.refresh_token || '')
       
       // Update tokens in database
       await supabase
@@ -76,7 +76,11 @@ export async function POST(request: NextRequest) {
           const result = await syncAndProcessGoogleDriveFolder(
             integration,
             folder,
-            tokens
+            {
+              access_token: tokens.access_token || '',
+              refresh_token: tokens.refresh_token || undefined,
+              expiry_date: tokens.expiry_date
+            }
           )
 
           totalFilesFound += result.filesFound

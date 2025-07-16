@@ -60,7 +60,7 @@ const testimonials = [
     avatar: '/testimonials/toth.jpg',
     content: 'Interjúk és teljesítményértékelések rögzítése korábban rengeteg időt vett el. A HangJegyzet segítségével most teljes mértékben a jelöltre vagy munkatársra tudok koncentrálni, miközben minden fontos információ rögzítésre kerül.',
     rating: 5,
-    highlight: 'GDPR-konform dokumentáció',
+    highlight: 'GDPR megfelelő dokumentáció',
     results: [
       'Objektív értékelési dokumentáció',
       'Jobb jelölt élmény az interjúkon',

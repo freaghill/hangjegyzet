@@ -14,8 +14,8 @@ import { cacheKeys } from '@/lib/cache/redis-client'
 /**
  * GET /api/v1/meetings - List meetings
  */
-export const GET = withApiAuth(
-  withCache(async (request, context) => {
+export const GET = withApiAuth<any>(
+  async (request, context) => {
     const { searchParams } = new URL(request.url)
     
     // Parse pagination params
@@ -91,23 +91,14 @@ export const GET = withApiAuth(
     })
     
     return response
-  }, {
-    ttl: 300, // 5 minutes
-    key: (req) => {
-      const url = new URL(req.url)
-      const params = url.searchParams.toString()
-      return cacheKeys.userMeetings(context.organizationId) + ':' + params
-    },
-    swr: true,
-    swrTtl: 60,
-  }), 
+  },
   { resource: 'meetings', action: 'read' }
 )
 
 /**
  * POST /api/v1/meetings - Create a new meeting via URL
  */
-export const POST = withApiAuth(async (request, context) => {
+export const POST = withApiAuth<any>(async (request, context) => {
   try {
     const body = await request.json()
     const { url, title, language = 'hu' } = body

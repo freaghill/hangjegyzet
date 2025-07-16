@@ -83,7 +83,7 @@ export default function MeetingsPage() {
       })
     } catch (error) {
       console.error('Error loading meetings:', error)
-      toast.error('Hiba történt a meetingek betöltése során')
+      toast.error('Hiba történt a megbeszélések betöltése során')
     } finally {
       setIsLoading(false)
     }
@@ -135,7 +135,7 @@ export default function MeetingsPage() {
   }
 
   const handleDelete = async (meeting: Meeting) => {
-    if (!confirm('Biztosan törölni szeretné ezt a meetinget?')) return
+    if (!confirm('Biztosan törölni szeretné ezt a megbeszélést?')) return
     
     try {
       const { error } = await supabase
@@ -145,7 +145,7 @@ export default function MeetingsPage() {
       
       if (error) throw error
       
-      toast.success('Meeting törölve')
+      toast.success('Megbeszélés törölve')
       loadAllMeetings()
     } catch (error) {
       console.error('Delete error:', error)
@@ -166,7 +166,7 @@ export default function MeetingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Meetingek</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Megbeszélések</h1>
         <p className="text-gray-600 mt-2">
           Keresse meg és tekintse át az összes rögzített megbeszélést
         </p>

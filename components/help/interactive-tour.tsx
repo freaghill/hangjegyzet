@@ -36,7 +36,7 @@ interface TourStep {
 const tourSteps: TourStep[] = [
   {
     id: 'welcome',
-    title: 'Üdvözöljük a HangJegyzet.AI-ban! 👋',
+    title: 'Üdvözöljük a HangJegyzetben! 👋',
     description: 'Fedezze fel platformunk főbb funkcióit ebben a rövid bemutatóban.',
   },
   {
@@ -84,7 +84,7 @@ const tourSteps: TourStep[] = [
   {
     id: 'complete',
     title: 'Gratulálunk! 🎉',
-    description: 'Megismerte a főbb funkciókat. Kezdje el használni a HangJegyzet.AI-t még ma!',
+    description: 'Megismerte a főbb funkciókat. Kezdje el használni a HangJegyzetet még ma!',
   },
 ]
 

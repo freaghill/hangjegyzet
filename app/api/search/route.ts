@@ -71,7 +71,7 @@ export const GET = withCache(async (request: NextRequest) => {
     const fields = searchParams.get('fields')
     const includeTranscript = searchParams.get('includeTranscript') === 'true'
 
-    const searchQuery: SearchQuery = {
+    const searchQuery = {
       query,
       filters,
       limit: pagination.limit,
@@ -81,15 +81,15 @@ export const GET = withCache(async (request: NextRequest) => {
       order: pagination.order,
       fields: fields ? fields.split(',') : undefined,
       includeTranscript
-    }
+    } as SearchQuery & { sort?: string; order?: string; fields?: string[]; includeTranscript?: boolean }
 
     const searchService = new SearchService()
-    const results = await searchService.searchOptimized(searchQuery)
+    const results = await searchService.search(searchQuery)
     
     // Create paginated response
     const response = NextResponse.json(
       createPaginatedResponse(
-        results.meetings,
+        results.results,
         results.total,
         pagination
       )

@@ -34,7 +34,7 @@ export default function DashboardLayout({
               </Link>
               <div className="hidden md:flex space-x-6">
                 <Link href="/dashboard" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">
-                  Meetingek
+                  Megbeszélések
                 </Link>
                 <Link href="/teams" className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium flex items-center gap-1">
                   <Users className="h-4 w-4" />

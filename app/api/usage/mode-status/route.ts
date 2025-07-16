@@ -53,11 +53,11 @@ export async function GET(request: NextRequest) {
 
         return {
           mode,
-          available: usage?.available || false,
-          used: usage?.used || 0,
-          limit: usage?.limit_minutes || 0,
-          remaining: usage?.remaining || 0,
-          unlimited: usage?.limit_minutes === -1
+          available: (usage as any)?.available || false,
+          used: (usage as any)?.used || 0,
+          limit: (usage as any)?.limit_minutes || 0,
+          remaining: (usage as any)?.remaining || 0,
+          unlimited: (usage as any)?.limit_minutes === -1
         }
       })
     )

@@ -17,7 +17,7 @@ import {
 const docCategories = [
   {
     title: 'Első lépések',
-    description: 'Kezdje el használni a HangJegyzet.AI-t perceken belül',
+    description: 'Kezdje el használni a HangJegyzetet perceken belül',
     icon: PlayCircle,
     color: 'bg-blue-100 text-blue-600',
     links: [
@@ -53,7 +53,7 @@ const docCategories = [
   },
   {
     title: 'API Fejlesztőknek',
-    description: 'Építsen a HangJegyzet.AI API-ra',
+    description: 'Építsen a HangJegyzet API-ra',
     icon: Code,
     color: 'bg-orange-100 text-orange-600',
     links: [
@@ -126,7 +126,7 @@ export default function DocsPage() {
               Dokumentáció
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Minden, amit tudnia kell a HangJegyzet.AI használatáról. 
+              Minden, amit tudnia kell a HangJegyzet használatáról. 
               Útmutatók, oktatóanyagok és API referencia.
             </p>
           </div>

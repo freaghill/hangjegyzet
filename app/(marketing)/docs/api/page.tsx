@@ -134,7 +134,7 @@ export default function APIDocsPage() {
             API Dokumentáció
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl">
-            Integrálja a HangJegyzet.AI képességeit saját alkalmazásába. 
+            Integrálja a HangJegyzet képességeit saját alkalmazásába. 
             RESTful API teljes transcript és AI funkciókkal.
           </p>
         </div>

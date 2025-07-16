@@ -76,8 +76,8 @@ export class TranscriptionProcessor {
         })
         .single()
         
-      if (modeAvailability && !modeAvailability.available) {
-        throw new Error(`Nincs elegendő ${mode} mód perc a havi keretben (${modeAvailability.used}/${modeAvailability.limit_minutes} használva)`)
+      if (modeAvailability && !(modeAvailability as any).available) {
+        throw new Error(`Nincs elegendő ${mode} mód perc a havi keretben (${(modeAvailability as any).used}/${(modeAvailability as any).limit_minutes} használva)`)
       }
 
       let result: TranscriptionResult
@@ -568,7 +568,7 @@ export class TranscriptionProcessor {
               
               <hr style="margin: 32px 0; border: none; border-top: 1px solid #e5e5e5;">
               <p style="color: #666; font-size: 14px;">
-                HangJegyzet.AI - AI-alapú meeting jegyzetelés<br>
+                HangJegyzet - AI-alapú meeting jegyzetelés<br>
                 <a href="https://hangjegyzet.ai" style="color: #2563eb;">hangjegyzet.ai</a>
               </p>
             </div>
@@ -589,7 +589,7 @@ export class TranscriptionProcessor {
             
             Ha a probléma továbbra is fennáll, kérjük vegye fel velünk a kapcsolatot.
             
-            HangJegyzet.AI - AI-alapú meeting jegyzetelés
+            HangJegyzet - AI-alapú meeting jegyzetelés
             https://hangjegyzet.ai
           `
         })

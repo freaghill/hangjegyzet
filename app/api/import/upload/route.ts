@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     try {
       const metadata = await ffprobeAsync(filePath)
       duration = metadata.format.duration || 0
-      hasVideo = metadata.streams.some(stream => stream.codec_type === 'video')
+      hasVideo = metadata.streams.some((stream: any) => stream.codec_type === 'video')
     } catch (error) {
       console.error('Error getting file metadata:', error)
     }

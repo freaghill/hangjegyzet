@@ -41,7 +41,7 @@ export default function ChangelogPage() {
           </div>
           <h1 className="text-3xl font-bold">Újdonságok</h1>
           <p className="text-gray-600 mt-2">
-            Kövesse nyomon a HangJegyzet.AI legújabb funkcióit és fejlesztéseit
+            Kövesse nyomon a HangJegyzet legújabb funkcióit és fejlesztéseit
           </p>
         </div>
       </header>

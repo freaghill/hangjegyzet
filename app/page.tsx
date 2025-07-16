@@ -75,7 +75,7 @@ export default function HomePage() {
               <div className="text-4xl mb-4">💼</div>
               <h3 className="text-xl font-semibold mb-2">Tanácsadóknak</h3>
               <p className="text-gray-600">
-                Projekt meetingek automatikus jegyzőkönyve. <strong>Fókuszáljon az ügyfélre, ne a jegyzetelésre.</strong>
+                Projekt megbeszélések automatikus jegyzőkönyve. <strong>Fókuszáljon az ügyfélre, ne a jegyzetelésre.</strong>
               </p>
               <Link href="/megoldas/tanacsadoknak" className="text-blue-600 font-medium mt-2 inline-block">
                 Tudjon meg többet →
@@ -109,7 +109,7 @@ export default function HomePage() {
               Így működik - 3 egyszerű lépésben
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              A meeting végétől 2 percen belül kész jegyzőkönyvet kap
+              Percek alatt elkészül a pontos jegyzőkönyv
             </p>
           </div>
           <div className="space-y-12">
@@ -135,7 +135,7 @@ export default function HomePage() {
                   AI feldolgozás
                 </h3>
                 <p className="text-gray-600">
-                  <strong>1-2 perc alatt kész</strong> - AI-unk pontosan átírja és intelligensen összefoglalja a beszélgetést.
+                  <strong>Pontos és intelligens</strong> - AI-unk precízen átírja és értelmesen összefoglalja a beszélgetést.
                 </p>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function HomePage() {
             </h2>
             <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
               Három átírási mód közül választhat - csak azért fizet, amire tényleg szüksége van.
-              Minden csomagban elérhető mindhárom mód, csak a mennyiség változik.
+              Az Induló csomag Fast és Balanced módot tartalmaz, a Profi csomagtól érhető el a Precision mód.
             </p>
           </div>
           
@@ -281,7 +281,7 @@ export default function HomePage() {
       <section className="py-24">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            Spóroljon 30 percet minden meeting után
+            Spóroljon 30 percet minden megbeszélés után
           </h2>
           <p className="text-xl text-gray-600 mb-8">
             Csatlakozzon az egyre növekvő felhasználóink közé!

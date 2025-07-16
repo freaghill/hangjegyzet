@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { SubscriptionManager, SubscriptionPlan } from '@/lib/payments/subscription'
+import { SubscriptionManager } from '@/lib/payments/subscription'
+import { SubscriptionPlan } from '@/lib/payments/subscription-plans'
 
 export async function POST(request: NextRequest) {
   try {

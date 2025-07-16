@@ -25,7 +25,7 @@ const features = [
   },
   {
     icon: Shield,
-    title: 'Biztonságos és GDPR-konform',
+    title: 'Biztonságos és GDPR megfelelő',
     description: 'Európai szervereken tároljuk adatait, teljes GDPR megfelelőséggel. Az Ön adatai az Öné maradnak.',
     benefits: ['EU szerverek', 'Titkosított tárolás', 'Adatok törlése kérésre']
   },

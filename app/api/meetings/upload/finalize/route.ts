@@ -176,10 +176,9 @@ export async function POST(request: NextRequest) {
       await processTranscriptionJob({
         meetingId: meeting.id,
         organizationId: profile.organization_id,
-        audioFileUrl: storageData.path,
+        fileUrl: storageData.path,
         mode: mode as TranscriptionMode,
-        processingOptions,
-        estimatedDuration
+        options: processingOptions
       })
     } catch (jobError) {
       console.error('Failed to queue transcription job:', jobError)

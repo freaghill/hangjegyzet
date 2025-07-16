@@ -30,7 +30,7 @@ export const WelcomeEmail = ({
   <Html>
     <Head />
     <Preview>
-      Üdvözöljük a HangJegyzet.AI-nál! Kezdje el a meetingek átalakítását.
+      Üdvözöljük a HangJegyzetnél! Kezdje el a meetingek átalakítását.
     </Preview>
     <Body style={main}>
       <Container style={container}>
@@ -38,14 +38,14 @@ export const WelcomeEmail = ({
           src={`${baseUrl}/logo.png`}
           width="150"
           height="50"
-          alt="HangJegyzet.AI"
+          alt="HangJegyzet"
           style={logo}
         />
         
         <Heading style={h1}>Üdvözöljük, {userName}! 🎉</Heading>
         
         <Text style={paragraph}>
-          Köszönjük, hogy regisztrált a HangJegyzet.AI platformra. Örülünk, hogy 
+          Köszönjük, hogy regisztrált a HangJegyzet platformra. Örülünk, hogy 
           csatlakozott hozzánk a meeting átírás és intelligencia forradalmasításában.
         </Text>
 
@@ -114,7 +114,7 @@ export const WelcomeEmail = ({
         </Text>
         
         <Text style={footer}>
-          HangJegyzet.AI • Budapest, Magyarország
+          HangJegyzet • Budapest, Magyarország
         </Text>
         
         <Text style={footerLinks}>
