@@ -154,7 +154,7 @@ export function ExportDialog({
     },
     medical: {
       name: 'Egészségügyi sablon',
-      description: 'GDPR-konform orvosi dokumentáció',
+      description: 'GDPR megfelelő orvosi dokumentáció',
       sections: ['Titoktartási figyelmeztetés', 'Klinikai összefoglaló', 'Kezelési terv', 'Konzultációs jegyzet']
     },
     custom: {

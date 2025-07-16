@@ -46,7 +46,7 @@ const docPages: DocPage[] = [
   {
     id: 'getting-started',
     title: 'Kezdő útmutató',
-    description: 'Ismerje meg a HangJegyzet.AI alapjait',
+    description: 'Ismerje meg a HangJegyzet alapjait',
     category: 'Alapok',
     path: '/docs/getting-started',
     keywords: ['kezdés', 'első lépések', 'regisztráció', 'beállítás'],

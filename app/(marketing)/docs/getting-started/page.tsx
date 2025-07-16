@@ -47,7 +47,7 @@ export default function GettingStartedPage() {
         {/* Introduction */}
         <div className="prose prose-lg max-w-none mb-12">
           <p className="lead text-xl text-gray-600">
-            Üdvözöljük a HangJegyzet.AI-ban! Ez az útmutató végigvezeti az első lépéseken, 
+            Üdvözöljük a HangJegyzetben! Ez az útmutató végigvezeti az első lépéseken, 
             hogy perceken belül elkezdhesse használni a platformot.
           </p>
         </div>
@@ -100,7 +100,7 @@ export default function GettingStartedPage() {
               <div>
                 <h2 className="text-2xl font-bold mb-2">Első meeting feltöltése</h2>
                 <p className="text-gray-600">
-                  A HangJegyzet.AI többféle módon tud meeting felvételeket feldolgozni.
+                  A HangJegyzet többféle módon tud meeting felvételeket feldolgozni.
                 </p>
               </div>
             </div>

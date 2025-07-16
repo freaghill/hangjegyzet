@@ -210,7 +210,7 @@ export function IntegrationsManager() {
         <div>
           <h2 className="text-2xl font-bold">Integrációk</h2>
           <p className="text-muted-foreground mt-1">
-            Kapcsolja össze a HangJegyzet.AI-t kedvenc eszközeivel
+            Kapcsolja össze a HangJegyzetet kedvenc eszközeivel
           </p>
         </div>
         <Badge variant="outline" className="text-lg px-3 py-1">

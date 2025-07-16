@@ -32,7 +32,7 @@ interface OnboardingData {
 const steps = [
   {
     id: 'welcome',
-    title: 'Üdvözöljük a HangJegyzet.AI-ban!',
+    title: 'Üdvözöljük a HangJegyzetben!',
     description: 'Néhány kérdéssel személyre szabjuk az élményt'
   },
   {
@@ -122,7 +122,7 @@ export function OnboardingFlow({ onComplete }: { onComplete?: () => void }) {
             <div>
               <h3 className="text-2xl font-bold mb-2">Kezdjük el!</h3>
               <p className="text-gray-600">
-                A HangJegyzet.AI segít időt spórolni automatikus meeting jegyzeteléssel.
+                A HangJegyzet segít időt spórolni automatikus meeting jegyzeteléssel.
                 Válaszoljon néhány kérdésre, hogy személyre szabhassuk az élményt.
               </p>
             </div>

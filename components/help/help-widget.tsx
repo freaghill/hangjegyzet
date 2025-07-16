@@ -67,7 +67,7 @@ const helpArticles: HelpArticle[] = [
     category: 'basics',
     icon: <Book className="w-4 h-4" />,
     content: `
-## Üdvözöljük a HangJegyzet.AI-ban!
+## Üdvözöljük a HangJegyzetben!
 
 ### 1. Fiók létrehozása
 - Kattintson a "Regisztráció" gombra

@@ -46,7 +46,7 @@ export function HeroSection() {
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-              <span className="text-gray-700">GDPR-konform</span>
+              <span className="text-gray-700">GDPR megfelelő</span>
             </div>
           </div>
           
